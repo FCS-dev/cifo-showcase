@@ -123,16 +123,21 @@
 
                             <dt>{{ __('front.project.meta_student') }}</dt>
                             <dd>
-                                @forelse ($project->students as $student)
-                                    <span>
-                                        {{ $student->name }}@if ($student->email) — {{ $student->email }}@endif
-                                    </span>
-                                    @if (!$loop->last)
-                                        <br>
-                                    @endif
-                                @empty
+                                @if ($project->students->isNotEmpty())
+                                    <ul class="project-detail-students-list">
+                                        @foreach ($project->students as $student)
+                                            <li>
+                                                <span class="project-detail-student-name">{{ $student->name }}</span>
+                                                @if ($student->email)
+                                                    <span
+                                                        class="project-detail-student-email">{{ $student->email }}</span>
+                                                @endif
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @else
                                     —
-                                @endforelse
+                                @endif
                             </dd>
 
                             @if ($teacherNames)
