@@ -1,0 +1,39 @@
+/* ══════════════════════════════════════════════════════════
+   GRID.CSS — CIFO Violeta Showcase
+   Responsive project card grid
+   ══════════════════════════════════════════════════════════ */
+
+/* Self-adapting responsive grid.
+ * `min(280px, 100%)` prevents horizontal overflow on viewports narrower than 280px.
+ * `justify-content: center` centers orphan cards on the last row. */
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+    gap: var(--space-6);
+    justify-content: center;
+}
+
+@media (min-width: 40em) {
+    .projects-grid {
+        gap: var(--space-8);
+    }
+}
+
+/* ─────────────────────────────────────────
+   GRID ITEM — Base transitions for cards
+   ───────────────────────────────────────── */
+.grid-item {
+    transition: opacity var(--transition-slow),
+        transform var(--transition-slow);
+}
+
+/* Hide items when filtered out — display:none handled by .card.is-hidden in card.css */
+.grid-item.is-hidden {
+    pointer-events: none;
+}
+
+/* Animate items appearing */
+.grid-item.is-visible {
+    opacity: 1;
+    transform: scale(1);
+}

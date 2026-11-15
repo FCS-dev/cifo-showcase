@@ -1,0 +1,89 @@
+/* ══════════════════════════════════════════════════════════
+   PAGINATION.CSS — CIFO Violeta Showcase
+   Targets blade structure: nav.pagination > ul.pagination-list >
+   li.pagination-item[.active|.disabled] > a|span.pagination-link
+   ══════════════════════════════════════════════════════════ */
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding-block: var(--space-12) var(--space-16);
+}
+
+.pagination-list {
+    display: flex;
+}
+
+/* ─────────────────────────────────────────
+   BASE ITEM — applies to links AND spans
+   ───────────────────────────────────────── */
+.pagination-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    height: 2.5rem;
+    padding-inline: var(--space-3);
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-muted);
+    background: var(--color-neutral-0);
+    border: 1.5px solid var(--color-border);
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+        color var(--transition-fast),
+        background var(--transition-fast),
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+a.pagination-link:hover {
+    border-color: var(--color-primary-400);
+    color: var(--color-primary-700);
+    background: var(--color-primary-50);
+}
+
+a.pagination-link:focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 2px;
+}
+
+/* ─────────────────────────────────────────
+   CURRENT PAGE
+   ───────────────────────────────────────── */
+.pagination-item.active .pagination-link {
+    background: var(--color-primary-600);
+    border-color: var(--color-primary-600);
+    color: var(--color-neutral-0);
+    font-weight: var(--weight-semibold);
+    cursor: default;
+    pointer-events: none;
+}
+
+/* ─────────────────────────────────────────
+   DISABLED — prev/next at boundaries
+   aria-disabled="true" on the <li>
+   ───────────────────────────────────────── */
+.pagination-item[aria-disabled="true"] .pagination-link {
+    opacity: 0.38;
+    cursor: default;
+    pointer-events: none;
+}
+
+/* ─────────────────────────────────────────
+   ELLIPSIS — aria-hidden="true" on the <li>
+   ───────────────────────────────────────── */
+.pagination-item[aria-hidden="true"] .pagination-link {
+    border-color: transparent;
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: default;
+    pointer-events: none;
+    user-select: none;
+}

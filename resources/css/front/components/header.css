@@ -1,0 +1,176 @@
+/* ══════════════════════════════════════════════════════════
+   HEADER.CSS — CIFO Violeta Showcase
+   Header + navigation + mobile menu
+   ══════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────
+   HEADER INNER LAYOUT
+   ───────────────────────────────────────── */
+.header {
+    position: relative;
+}
+
+.header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-block: var(--space-4);
+    gap: var(--space-8);
+}
+
+/* ─────────────────────────────────────────
+   LOGO
+   ───────────────────────────────────────── */
+.header-logo {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.header-logo:hover {
+    opacity: 0.85;
+}
+
+.header-logo:focus-visible {
+    outline: 2px solid var(--color-primary-400);
+    outline-offset: 4px;
+    border-radius: var(--radius-sm);
+}
+
+/* ─────────────────────────────────────────
+   DESKTOP NAV
+   ───────────────────────────────────────── */
+.header-nav {
+    display: none;
+    align-items: center;
+    gap: var(--space-8);
+}
+
+@media (min-width: 64em) {
+    .header-nav {
+        display: flex;
+    }
+}
+
+.nav-link {
+    font-family: var(--font-heading);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-wide);
+    color: var(--color-text-muted);
+    transition: color var(--transition-fast);
+    position: relative;
+    padding-bottom: var(--space-1);
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--color-primary-500);
+    border-radius: var(--radius-full);
+    transition: width var(--transition-base);
+}
+
+.nav-link:hover {
+    color: var(--color-text);
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+.nav-link[aria-current="page"] {
+    color: var(--color-primary-500);
+    font-weight: var(--weight-semibold);
+}
+
+.nav-link[aria-current="page"]::after {
+    width: 100%;
+}
+
+.nav-link:focus-visible {
+    outline: 2px solid var(--color-primary-400);
+    outline-offset: 4px;
+    border-radius: var(--radius-sm);
+}
+
+/* ─────────────────────────────────────────
+   ACTIONS (lang + hamburger)
+   ───────────────────────────────────────── */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────
+   HAMBURGER BUTTON
+   ───────────────────────────────────────── */
+.menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    transition: background-color var(--transition-fast),
+        color var(--transition-fast);
+}
+
+.menu-toggle:hover {
+    background-color: var(--color-neutral-100);
+}
+
+.menu-toggle:focus-visible {
+    outline: 2px solid var(--color-primary-400);
+    outline-offset: 2px;
+}
+
+@media (min-width: 64em) {
+    .menu-toggle {
+        display: none;
+    }
+}
+
+/* Hamburger icon — 3 animated spans */
+.menu-icon {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 22px;
+    height: 22px;
+}
+
+.menu-icon span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: currentColor;
+    border-radius: var(--radius-full);
+    transition: transform var(--transition-base),
+        opacity var(--transition-fast),
+        width var(--transition-base);
+    transform-origin: center;
+}
+
+/* Animate to X when open */
+.menu-toggle[aria-expanded="true"] .menu-icon span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.menu-toggle[aria-expanded="true"] .menu-icon span:nth-child(2) {
+    opacity: 0;
+    width: 0;
+}
+
+.menu-toggle[aria-expanded="true"] .menu-icon span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}

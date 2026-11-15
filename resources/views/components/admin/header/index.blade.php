@@ -1,0 +1,33 @@
+<header class="navbar bg-base-100 border-b border-base-300 sticky top-0 z-30 gap-2 px-4">
+
+    {{-- Toggle sidebar (solo móvil) --}}
+    <div class="flex-none lg:hidden">
+        <label for="sidebar-toggle" class="btn btn-ghost btn-sm btn-square"
+            aria-label="{{ __('admin.nav.open_sidebar') }}">
+            <i class="icofont-navigation-menu text-xl" aria-hidden="true"></i>
+        </label>
+    </div>
+
+    {{-- Breadcrumb (ocupa el espacio central) --}}
+    <div class="flex-1 min-w-0 overflow-hidden">
+
+    </div>
+
+    {{-- Acciones del header --}}
+    <div class="flex-none flex items-center gap-1">
+
+        {{-- Toggle de tema --}}
+        <x-admin.header.theme-toggle />
+
+        {{-- Toggle de language --}}
+        <x-admin.ui.language-switcher />
+
+        {{-- Notificaciones --}}
+        <x-admin.header.notifications />
+
+        {{-- Menú de perfil --}}
+        <x-admin.header.profile-menu />
+
+    </div>
+
+</header>

@@ -1,0 +1,425 @@
+<aside class="bg-neutral text-neutral-content min-h-full w-72 flex flex-col">
+
+    {{-- Logo --}}
+    <div class="p-4 pb-2">
+        <x-admin.sidebar.logo />
+    </div>
+
+    {{-- Divider --}}
+    <div class="divider divider-neutral my-0 px-4 opacity-20"></div>
+
+    {{-- Navegación principal --}}
+    <nav class="flex-1 overflow-y-auto p-4" aria-label="Menú principal">
+        <ul class="menu menu-sm w-full gap-0.5 p-0">
+
+            {{-- Dashboard --}}
+            <li>
+                <a href="{{ route('dashboard') }}" @class([
+                    'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors',
+                    'bg-primary text-primary-content font-semibold' => request()->routeIs(
+                        'dashboard'),
+                    'hover:bg-neutral-content/10' => !request()->routeIs('dashboard'),
+                ])>
+                    <i class="icofont-dashboard-web text-lg w-5 text-center" aria-hidden="true"></i>
+                    <span>{{ __('admin.nav.dashboard') }}</span>
+                </a>
+            </li>
+
+            {{-- Sección Administración --}}
+            @canany(['users.view', 'roles.view', 'permissions.view'])
+                <li
+                    class="menu-title mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-widest text-neutral-content/50">
+                    {{ __('admin.nav.admin_section') }}
+                </li>
+
+                {{-- Usuarios --}}
+                @can('users.view')
+                    <li>
+                        <details @class(['open' => request()->routeIs('users.*')])>
+                            <summary @class([
+                                'flex items-center gap-3 rounded-lg px-3 py-2.5 cursor-pointer transition-colors list-none',
+                                'bg-primary text-primary-content font-semibold' => request()->routeIs(
+                                    'users.*'),
+                                'hover:bg-neutral-content/10' => !request()->routeIs('users.*'),
+                            ])>
+                                <i class="icofont-users text-lg w-5 text-center" aria-hidden="true"></i>
+                                <span class="flex-1">{{ __('admin.nav.users') }}</span>
+                            </summary>
+                            <ul class="mt-0.5 space-y-0.5">
+                                <li>
+                                    <a href="{{ route('users.index') }}" @class([
+                                        'block pl-9 pr-3 py-2.5 rounded-lg text-sm transition-colors',
+                                        'bg-white text-primary font-semibold' => request()->routeIs('users.index'),
+                                        'hover:bg-neutral-content/10' => !request()->routeIs('users.index'),
+                                    ])>
+                                        {{ __('admin.nav.users_list') }}
+                                    </a>
+                                </li>
+                                @can('users.create')
+                                    <li>
+                                        <a href="{{ route('users.create') }}" @class([
+                                            'block pl-9 pr-3 py-2.5 rounded-lg text-sm transition-colors',
+                                            'bg-white text-primary font-semibold' => request()->routeIs('users.create'),
+                                            'hover:bg-neutral-content/10' => !request()->routeIs('users.create'),
+                                        ])>
+                                            {{ __('admin.nav.users_create') }}
+                                        </a>
+                                    </li>
+                                @endcan
+                            </ul>
+                        </details>
+                    </li>
+                @endcan
+
+                {{-- Roles y Permisos --}}
+                @canany(['roles.view', 'permissions.view'])
+                    <li>
+                        <details @class(['open' => request()->routeIs('roles.*', 'permissions.*')])>
+                            <summary @class([
+                                'flex items-center gap-3 rounded-lg px-3 py-2.5 cursor-pointer transition-colors list-none',
+                                'bg-primary text-primary-content font-semibold' => request()->routeIs(
+                                    'roles.*',
+                                    'permissions.*'),
+                                'hover:bg-neutral-content/10' => !request()->routeIs(
+                                    'roles.*',
+                                    'permissions.*'),
+                            ])>
+                                <i class="icofont-shield text-lg w-5 text-center" aria-hidden="true"></i>
+                                <span class="flex-1">{{ __('admin.nav.access') }}</span>
+                            </summary>
+                            <ul class="mt-0.5 space-y-0.5">
+                                @can('roles.view')
+                                    <li>
+                                        <a href="{{ route('roles.index') }}" @class([
+                                            'block pl-9 pr-3 py-2.5 rounded-lg text-sm transition-colors',
+                                            'bg-white text-primary font-semibold' => request()->routeIs('roles.*'),
+                                            'hover:bg-neutral-content/10' => !request()->routeIs('roles.*'),
+                                        ])>
+                                            {{ __('admin.nav.roles') }}
+                                        </a>
+                                    </li>
+                                @endcan
+                                @can('permissions.view')
+                                    <li>
+                                        <a href="{{ route('permissions.index') }}" @class([
+                                            'block pl-9 pr-3 py-2.5 rounded-lg text-sm transition-colors',
+                                            'bg-white text-primary font-semibold' => request()->routeIs(
+                                                'permissions.*'),
+                                            'hover:bg-neutral-content/10' => !request()->routeIs('permissions.*'),
+                                        ])>
+                                            {{ __('admin.nav.permissions') }}
+                                        </a>
+                                    </li>
+                                @endcan
+                            </ul>
+                        </details>
+                    </li>
+                @endcanany
+            @endcanany
+
+            {{-- Sección Contenido --}}
+            @canany(['categories.view', 'courses.view', 'tags.view', 'projects.view'])
+                <li
+                    class="menu-title mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-widest text-neutral-content/50">
+                    {{ __('admin.nav.content_section') }}
+                </li>
+
+                {{-- Categorías --}}
+                @can('categories.view')
+                    <li>
+                        <details @class(['open' => request()->routeIs('categories.*')])>
+                            <summary @class([
+                                'flex items-center gap-3 rounded-lg px-3 py-2.5 cursor-pointer transition-colors list-none',
+                                'bg-primary text-primary-content font-semibold' => request()->routeIs(
+                                    'categories.*'),
+                                'hover:bg-neutral-content/10' => !request()->routeIs('categories.*'),
+                            ])>
+                                <i class="icofont-listine-dots text-lg w-5 text-center" aria-hidden="true"></i>
+                                <span class="flex-1">{{ __('admin.nav.categories') }}</span>
+                            </summary>
+                            <ul class="mt-0.5 space-y-0.5">
+                                <li>
+                                    <a href="{{ route('categories.index') }}" @class([
+                                        'block pl-9 pr-3 py-2.5 rounded-lg text-sm transition-colors',
+                                        'bg-white text-primary font-semibold' => request()->routeIs(
+                                            'categories.index'),
+                                        'hover:bg-neutral-content/10' => !request()->routeIs('categories.index'),
+                                    ])>
+                                        {{ __('admin.nav.categories_list') }}
+                                    </a>
+                                </li>
+                                @can('categories.create')
+                                    <li>
+                                        <a href="{{ route('categories.create') }}" @class([
+                                            'block pl-9 pr-3 py-2.5 rounded-lg text-sm transition-colors',
+                                            'bg-white text-primary font-semibold' => request()->routeIs(
+                                                'categories.create'),
+                                            'hover:bg-neutral-content/10' => !request()->routeIs('categories.create'),
+                                        ])>
+                                            {{ __('admin.nav.categories_create') }}
+                                        </a>
+                                    </li>
+                                @endcan
+                            </ul>
+                        </details>
+                    </li>
+                @endcan
+
+                {{-- Cursos --}}
+                @can('courses.view')
+                    <li>
+                        <details @class(['open' => request()->routeIs('courses.*')])>
+                            <summary @class([
+                                'flex items-center gap-3 rounded-lg px-3 py-2.5 cursor-pointer transition-colors list-none',
+                                'bg-primary text-primary-content font-semibold' => request()->routeIs(
+                                    'courses.*'),
+                                'hover:bg-neutral-content/10' => !request()->routeIs('courses.*'),
+                            ])>
+                                <i class="icofont-book-alt text-lg w-5 text-center" aria-hidden="true"></i>
+                                <span class="flex-1">{{ __('admin.nav.courses') }}</span>
+                            </summary>
+                            <ul class="mt-0.5 space-y-0.5">
+                                <li>
+                                    <a href="{{ route('courses.index') }}" @class([
+                                        'block pl-9 pr-3 py-2.5 rounded-lg text-sm transition-colors',
+                                        'bg-white text-primary font-semibold' => request()->routeIs(
+                                            'courses.index'),
+                                        'hover:bg-neutral-content/10' => !request()->routeIs('courses.index'),
+                                    ])>
+                                        {{ __('admin.nav.courses_list') }}
+                                    </a>
+                                </li>
+                                @can('courses.create')
+                                    <li>
+                                        <a href="{{ route('courses.create') }}" @class([
+                                            'block pl-9 pr-3 py-2.5 rounded-lg text-sm transition-colors',
+                                            'bg-white text-primary font-semibold' => request()->routeIs(
+                                                'courses.create'),
+                                            'hover:bg-neutral-content/10' => !request()->routeIs('courses.create'),
+                                        ])>
+                                            {{ __('admin.nav.courses_create') }}
+                                        </a>
+                                    </li>
+                                @endcan
+                            </ul>
+                        </details>
+                    </li>
+                @endcan
+
+                @can('tags.view')
+                    <li>
+                        <details @class(['open' => request()->routeIs('tags.*')])>
+                            <summary @class([
+                                'flex items-center gap-3 rounded-lg px-3 py-2.5 cursor-pointer transition-colors list-none',
+                                'bg-primary text-primary-content font-semibold' => request()->routeIs(
+                                    'tags.*'),
+                                'hover:bg-neutral-content/10' => !request()->routeIs('tags.*'),
+                            ])>
+                                <i class="icofont-price text-lg w-5 text-center" aria-hidden="true"></i>
+                                <span class="flex-1">{{ __('admin.nav.tags') }}</span>
+                            </summary>
+                            <ul class="mt-0.5 space-y-0.5">
+                                <li>
+                                    <a href="{{ route('tags.index') }}" @class([
+                                        'block pl-9 pr-3 py-2.5 rounded-lg text-sm transition-colors',
+                                        'bg-white text-primary font-semibold' => request()->routeIs('tags.index'),
+                                        'hover:bg-neutral-content/10' => !request()->routeIs('tags.index'),
+                                    ])>
+                                        {{ __('admin.nav.tags_list') }}
+                                    </a>
+                                </li>
+                                @can('tags.create')
+                                    <li>
+                                        <a href="{{ route('tags.create') }}" @class([
+                                            'block pl-9 pr-3 py-2.5 rounded-lg text-sm transition-colors',
+                                            'bg-white text-primary font-semibold' => request()->routeIs('tags.create'),
+                                            'hover:bg-neutral-content/10' => !request()->routeIs('tags.create'),
+                                        ])>
+                                            {{ __('admin.nav.tags_create') }}
+                                        </a>
+                                    </li>
+                                @endcan
+                            </ul>
+                        </details>
+                    </li>
+                @endcan
+
+                {{-- Proyectos --}}
+                @can('projects.view')
+                    <li>
+                        <details @class(['open' => request()->routeIs('admin.projects.*')])>
+                            <summary @class([
+                                'flex items-center gap-3 rounded-lg px-3 py-2.5 cursor-pointer transition-colors list-none',
+                                'bg-primary text-primary-content font-semibold' => request()->routeIs(
+                                    'projects.*'),
+                                'hover:bg-neutral-content/10' => !request()->routeIs('projects.*'),
+                            ])>
+                                <i class="icofont-image text-lg w-5 text-center" aria-hidden="true"></i>
+                                <span class="flex-1">{{ __('admin.nav.projects') }}</span>
+                            </summary>
+                            <ul class="mt-0.5 space-y-0.5">
+                                <li>
+                                    <a href="{{ route('admin.projects.index') }}" @class([
+                                        'block pl-9 pr-3 py-2.5 rounded-lg text-sm transition-colors',
+                                        'bg-white text-primary font-semibold' => request()->routeIs(
+                                            'projects.index'),
+                                        'hover:bg-neutral-content/10' => !request()->routeIs('projects.index'),
+                                    ])>
+                                        {{ __('admin.nav.projects_list') }}
+                                    </a>
+                                </li>
+                                @can('projects.create')
+                                    <li>
+                                        <a href="{{ route('admin.projects.create') }}" @class([
+                                            'block pl-9 pr-3 py-2.5 rounded-lg text-sm transition-colors',
+                                            'bg-white text-primary font-semibold' => request()->routeIs(
+                                                'projects.create'),
+                                            'hover:bg-neutral-content/10' => !request()->routeIs('projects.create'),
+                                        ])>
+                                            {{ __('admin.nav.projects_create') }}
+                                        </a>
+                                    </li>
+                                @endcan
+                            </ul>
+                        </details>
+                    </li>
+                @endcan
+
+            @endcanany
+
+            {{-- Sección Personas --}}
+            @canany(['students.view', 'teachers.view'])
+                <li
+                    class="menu-title mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-widest text-neutral-content/50">
+                    {{ __('admin.nav.people_section') }}
+                </li>
+
+                @can('students.view')
+                    <li>
+                        <details @class(['open' => request()->routeIs('students.*')])>
+                            <summary @class([
+                                'flex items-center gap-3 rounded-lg px-3 py-2.5 cursor-pointer transition-colors list-none',
+                                'bg-primary text-primary-content font-semibold' => request()->routeIs(
+                                    'students.*'),
+                                'hover:bg-neutral-content/10' => !request()->routeIs('students.*'),
+                            ])>
+                                <i class="icofont-student-alt text-lg w-5 text-center" aria-hidden="true"></i>
+                                <span class="flex-1">{{ __('admin.nav.students') }}</span>
+                            </summary>
+                            <ul class="mt-0.5 space-y-0.5">
+                                <li>
+                                    <a href="{{ route('students.index') }}" @class([
+                                        'block pl-9 pr-3 py-2.5 rounded-lg text-sm transition-colors',
+                                        'bg-white text-primary font-semibold' => request()->routeIs(
+                                            'students.index'),
+                                        'hover:bg-neutral-content/10' => !request()->routeIs('students.index'),
+                                    ])>
+                                        {{ __('admin.nav.students_list') }}
+                                    </a>
+                                </li>
+                                @can('students.create')
+                                    <li>
+                                        <a href="{{ route('students.create') }}" @class([
+                                            'block pl-9 pr-3 py-2.5 rounded-lg text-sm transition-colors',
+                                            'bg-white text-primary font-semibold' => request()->routeIs(
+                                                'students.create'),
+                                            'hover:bg-neutral-content/10' => !request()->routeIs('students.create'),
+                                        ])>
+                                            {{ __('admin.nav.students_create') }}
+                                        </a>
+                                    </li>
+                                @endcan
+                            </ul>
+                        </details>
+                    </li>
+                @endcan
+
+                @can('teachers.view')
+                    <li>
+                        <details @class(['open' => request()->routeIs('teachers.*')])>
+                            <summary @class([
+                                'flex items-center gap-3 rounded-lg px-3 py-2.5 cursor-pointer transition-colors list-none',
+                                'bg-primary text-primary-content font-semibold' => request()->routeIs(
+                                    'teachers.*'),
+                                'hover:bg-neutral-content/10' => !request()->routeIs('teachers.*'),
+                            ])>
+                                <i class="icofont-teacher text-lg w-5 text-center" aria-hidden="true"></i>
+                                <span class="flex-1">{{ __('admin.nav.teachers') }}</span>
+                            </summary>
+                            <ul class="mt-0.5 space-y-0.5">
+                                <li>
+                                    <a href="{{ route('teachers.index') }}" @class([
+                                        'block pl-9 pr-3 py-2.5 rounded-lg text-sm transition-colors',
+                                        'bg-white text-primary font-semibold' => request()->routeIs(
+                                            'teachers.index'),
+                                        'hover:bg-neutral-content/10' => !request()->routeIs('teachers.index'),
+                                    ])>
+                                        {{ __('admin.nav.teachers_list') }}
+                                    </a>
+                                </li>
+                                @can('teachers.create')
+                                    <li>
+                                        <a href="{{ route('teachers.create') }}" @class([
+                                            'block pl-9 pr-3 py-2.5 rounded-lg text-sm transition-colors',
+                                            'bg-white text-primary font-semibold' => request()->routeIs(
+                                                'teachers.create'),
+                                            'hover:bg-neutral-content/10' => !request()->routeIs('teachers.create'),
+                                        ])>
+                                            {{ __('admin.nav.teachers_create') }}
+                                        </a>
+                                    </li>
+                                @endcan
+                            </ul>
+                        </details>
+                    </li>
+                @endcan
+
+            @endcanany
+
+            {{-- Sección Cuenta --}}
+            <li
+                class="menu-title mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-widest text-neutral-content/50">
+                {{ __('admin.nav.account_section') }}
+            </li>
+
+            <li>
+                <a href="{{ route('profile.edit') }}" @class([
+                    'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors',
+                    'bg-primary text-primary-content font-semibold' => request()->routeIs(
+                        'profile.*'),
+                    'hover:bg-neutral-content/10' => !request()->routeIs('profile.*'),
+                ])>
+                    <i class="icofont-settings text-lg w-5 text-center" aria-hidden="true"></i>
+                    <span>{{ __('admin.nav.profile') }}</span>
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+
+    {{-- Usuario en la parte inferior --}}
+    @auth
+        <div class="p-4 border-t border-neutral-content/10">
+            <div class="flex items-center gap-3">
+                <div class="avatar avatar-placeholder">
+                    <div
+                        class="bg-primary text-primary-content rounded-full w-9 h-9 flex items-center justify-center text-sm font-bold">
+                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                    </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium truncate">{{ auth()->user()->name }}</p>
+                    <p class="text-xs opacity-60 truncate">{{ auth()->user()->email }}</p>
+                </div>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="btn btn-ghost btn-xs btn-circle opacity-60 hover:opacity-100"
+                        aria-label="{{ __('admin.nav.logout') }}" title="{{ __('admin.nav.logout') }}">
+                        <i class="icofont-logout text-base" aria-hidden="true"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    @endauth
+
+</aside>

@@ -1,0 +1,43 @@
+/* =============================================================
+ * resources/css/app.css  — Front public entry point
+ * Stack: vanilla CSS moderno (custom properties, cascade layers)
+ * NO Tailwind, NO DaisyUI en el front público.
+ * ============================================================= */
+/* ── Iconos ───────────────────────────────────────────────── */
+@import "./icofont.css";
+
+/* ── Base ─────────────────────────────────────────────────── */
+@import "./front/base/reset.css";
+@import "./front/base/variables.css";
+@import "./front/base/typography.css";
+@import "./front/base/utilities.css";
+@import "./front/base/print.css";
+
+/* ── Layout ───────────────────────────────────────────────── */
+@import "./front/layout/page.css";
+@import "./front/layout/container.css";
+@import "./front/layout/grid.css";
+
+/* ── Components ───────────────────────────────────────────── */
+@import "./front/components/hero.css";
+@import "./front/components/skip-link.css";
+@import "./front/components/badge.css";
+@import "./front/components/buttons.css";
+@import "./front/components/card.css";
+@import "./front/components/header.css";
+@import "./front/components/footer.css";
+@import "./front/components/mobile-nav.css";
+@import "./front/components/language-switcher.css";
+/* @import "./front/components/breadcrumb.css"; */
+@import "./front/components/carousel.css";
+@import "./front/components/modal.css";
+@import "./front/components/back-to-top.css";
+@import "./front/components/pagination.css";
+@import "./front/components/select-filter.css";
+@import "./front/components/sidebar.css";
+
+/* ── Pages ────────────────────────────────────────────────── */
+@import "./front/pages/home.css";
+@import "./front/pages/projects.css";
+@import "./front/pages/about.css";
+@import "./front/pages/project-detail.css";
