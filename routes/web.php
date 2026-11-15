@@ -33,6 +33,7 @@ Route::prefix('{locale}')
         Route::get('/projects/tag/{tag:slug}', [ProjectController::class, 'byTag'])->name('projects.tag');
         Route::get('/projects/{project:slug}', [ProjectController::class, 'show'])->name('projects.show');
         Route::get('/about', [PageController::class, 'about'])->name('about');
+        Route::get('/privacy', [PageController::class, 'privacy'])->name('privacy');
     });
 
 // ── Admin Dashboard ──────────────────────────────────────────

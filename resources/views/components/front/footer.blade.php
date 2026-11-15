@@ -27,6 +27,13 @@
                             <a href="{{ route('about') }}" class="footer-link">{{ __('front.nav.about') }}</a>
                         </div>
                     </div>
+
+                    <div>
+                        <p class="footer-link-group-title">{{ __('privacy.footer_title') }}</p>
+                        <div class="footer-link-group-items">
+                            <a href="{{ route('privacy') }}" class="footer-link">{{ __('privacy.link') }}</a>
+                        </div>
+                    </div>
                 </div>
             </div>
 

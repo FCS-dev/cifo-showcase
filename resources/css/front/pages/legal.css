@@ -1,0 +1,163 @@
+/* ══════════════════════════════════════════════════════════
+   LEGAL.CSS — CIFO Violeta Showcase
+   Page-specific styles for static legal pages
+   ══════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────
+   HERO
+   ───────────────────────────────────────── */
+.legal-hero {
+    background: linear-gradient(135deg,
+            var(--color-primary-800) 0%,
+            var(--color-primary-600) 60%,
+            var(--color-primary-500) 100%);
+    color: var(--color-text-inverse);
+    padding-block: var(--space-20) var(--space-16);
+    position: relative;
+    overflow: hidden;
+}
+
+.legal-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(ellipse 80% 60% at 100% 0%,
+            rgba(232, 184, 75, 0.12) 0%,
+            transparent 60%);
+    pointer-events: none;
+}
+
+.legal-breadcrumb {
+    margin-block-end: var(--space-8);
+}
+
+.legal-breadcrumb ol {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-wrap: wrap;
+}
+
+.legal-breadcrumb a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-size: var(--text-sm);
+    transition: color var(--transition-fast);
+}
+
+.legal-breadcrumb a:hover {
+    color: var(--color-text-inverse);
+}
+
+.legal-breadcrumb .breadcrumb-sep {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: var(--text-sm);
+}
+
+.legal-breadcrumb .breadcrumb-current {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: var(--text-sm);
+}
+
+.legal-hero-content {
+    position: relative;
+    max-width: 720px;
+}
+
+.legal-hero h1 {
+    font-family: var(--font-heading);
+    font-size: var(--text-4xl);
+    font-weight: var(--weight-extrabold);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+    color: var(--color-text-inverse);
+    margin-block-end: var(--space-4);
+}
+
+.legal-hero-content p {
+    font-family: var(--font-body);
+    font-size: var(--text-lg);
+    line-height: var(--leading-normal);
+    color: rgba(255, 255, 255, 0.85);
+    max-width: 620px;
+}
+
+@media (min-width: 48em) {
+    .legal-hero h1 {
+        font-size: var(--text-5xl);
+    }
+}
+
+/* ─────────────────────────────────────────
+   CONTENT
+   ───────────────────────────────────────── */
+.legal-content {
+    padding-block: var(--space-16);
+}
+
+.legal-content-inner {
+    max-width: 72ch;
+    margin-inline: auto;
+}
+
+.legal-updated {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-6);
+}
+
+.legal-intro {
+    font-size: var(--text-base);
+    line-height: var(--leading-loose);
+    color: var(--color-text);
+    margin-bottom: var(--space-10);
+}
+
+.legal-section {
+    margin-bottom: var(--space-8);
+}
+
+.legal-section:last-child {
+    margin-bottom: 0;
+}
+
+.legal-section h2 {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-tight);
+    color: var(--color-text);
+    margin-bottom: var(--space-3);
+}
+
+.legal-section p {
+    font-size: var(--text-base);
+    line-height: var(--leading-loose);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-3);
+}
+
+.legal-section p:last-child {
+    margin-bottom: 0;
+}
+
+.legal-section ul {
+    list-style: disc;
+    padding-left: var(--space-6);
+    margin: var(--space-3) 0 0;
+    display: grid;
+    gap: var(--space-2);
+}
+
+.legal-section li {
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
+    color: var(--color-text-muted);
+}
+
+.legal-section li::marker {
+    color: var(--color-primary-500);
+}

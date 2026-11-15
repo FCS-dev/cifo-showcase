@@ -37,4 +37,9 @@ class PageController extends Controller
 
         return view('front.about', compact('categories'));
     }
+
+    public function privacy(): View
+    {
+        return view('front.privacy');
+    }
 }
