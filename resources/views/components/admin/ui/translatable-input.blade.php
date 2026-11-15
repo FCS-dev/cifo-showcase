@@ -25,8 +25,9 @@
                 <input type="{{ $type }}" name="{{ $name }}[es]" id="{{ $name }}_es"
                     value="{{ old($name . '.es', $valueEs) }}"
                     @if ($placeholder) placeholder="{{ $placeholder }}" @endif @required($required)
+                    @if ($maxlength) maxlength="{{ $maxlength }}" @endif
                     @disabled($disabled) aria-invalid="{{ $hasErrorEs ? 'true' : 'false' }}"
-                    aria-describedby="{{ $name }}-es-help"
+                    aria-describedby="{{ $name }}-es-help{{ $help ? ' ' . $name . '-help' : '' }}"
                     @if ($formVar) x-model="{{ $formVar }}.{{ $name }}.es"
                         @change="{{ $formVar }}.validate('{{ $name }}.es')"
                     @else
@@ -58,8 +59,9 @@
                 <input type="{{ $type }}" name="{{ $name }}[ca]" id="{{ $name }}_ca"
                     value="{{ old($name . '.ca', $valueCa) }}"
                     @if ($placeholder) placeholder="{{ $placeholder }}" @endif @required($required)
+                    @if ($maxlength) maxlength="{{ $maxlength }}" @endif
                     @disabled($disabled) aria-invalid="{{ $hasErrorCa ? 'true' : 'false' }}"
-                    aria-describedby="{{ $name }}-ca-help"
+                    aria-describedby="{{ $name }}-ca-help{{ $help ? ' ' . $name . '-help' : '' }}"
                     @if ($formVar) x-model="{{ $formVar }}.{{ $name }}.ca"
                         @change="{{ $formVar }}.validate('{{ $name }}.ca')"
                     @else
@@ -75,12 +77,12 @@
                     <span x-cloak x-show="$data.form?.invalid('{{ $name }}.ca')"
                         x-text="$data.form?.errors?.['{{ $name }}.ca'] ?? ''"
                         class="text-error flex items-center gap-1"></span>
-                    @if ($help)
-                        <span
-                            x-show="!($data.form?.invalid('{{ $name }}.ca') ?? false)">{{ $help }}</span>
-                    @endif
                 @enderror
             </p>
         </div>
     </div>
+
+    @if ($help)
+        <p id="{{ $name }}-help" class="fieldset-label">{{ $help }}</p>
+    @endif
 </fieldset>

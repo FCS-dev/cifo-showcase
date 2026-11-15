@@ -14,7 +14,7 @@ use Spatie\Sluggable\HasTranslatableSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Translatable\HasTranslations;
 
-#[Fillable(['slug', 'name'])]
+#[Fillable(['slug', 'name', 'badge', 'short_description'])]
 class Category extends Model implements HasMedia
 {
     use HasFactory;
@@ -24,7 +24,14 @@ class Category extends Model implements HasMedia
     use InteractsWithMedia;
     use SoftDeletes;
 
-    public array $translatable = ['name', 'slug'];
+    public const FRONT_FALLBACKS = [
+        'programacion-y-desarrollo' => 'https://picsum.photos/seed/cifo-pd/800/600',
+        'ciberseguridad' => 'https://picsum.photos/seed/cifo-cs/800/600',
+        'tecnologias-emergentes' => 'https://picsum.photos/seed/cifo-te/800/600',
+        'competencias-digitales' => 'https://picsum.photos/seed/cifo-cd/800/600',
+    ];
+
+    public array $translatable = ['name', 'slug', 'badge', 'short_description'];
 
     public function getSlugOptions(): SlugOptions
     {
@@ -78,6 +85,13 @@ class Category extends Model implements HasMedia
     public function imageUrl(string $fallback, ?string $conversion = null): string
     {
         return $this->managedImageUrl('image', $fallback, $conversion);
+    }
+
+    public function fallbackImage(): string
+    {
+        $slug = $this->getTranslation('slug', 'es', false);
+
+        return self::FRONT_FALLBACKS[$slug] ?? asset('img/image-placeholder.svg');
     }
 
     public function courses()

@@ -33,7 +33,7 @@ class PageController extends Controller
 
     public function about(): View
     {
-        $categories = Category::orderBy('id')->get();
+        $categories = Category::with('media')->orderBy('id')->get();
 
         return view('front.about', compact('categories'));
     }

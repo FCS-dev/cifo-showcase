@@ -23,6 +23,7 @@ class TranslatableInput extends Component
         public bool $required = false,
         public bool $disabled = false,
         public ?string $formVar = null,
+        public ?int $maxlength = null,
     ) {
     }
 

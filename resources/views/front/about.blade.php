@@ -5,22 +5,6 @@
 
 <x-layouts.app :title="__('front.about.page_title')" :description="__('front.about.page_desc')">
 
-    @php
-        $programFallbacks = [
-            'pd' => 'https://picsum.photos/seed/cifo-pd/800/600',
-            'cs' => 'https://picsum.photos/seed/cifo-cs/800/600',
-            'te' => 'https://picsum.photos/seed/cifo-te/800/600',
-            'cd' => 'https://picsum.photos/seed/cifo-cd/800/600',
-        ];
-
-        $programImages = [
-            'pd' => $categories->get(0)?->imageUrl($programFallbacks['pd'], 'card') ?? $programFallbacks['pd'],
-            'cs' => $categories->get(1)?->imageUrl($programFallbacks['cs'], 'card') ?? $programFallbacks['cs'],
-            'te' => $categories->get(2)?->imageUrl($programFallbacks['te'], 'card') ?? $programFallbacks['te'],
-            'cd' => $categories->get(3)?->imageUrl($programFallbacks['cd'], 'card') ?? $programFallbacks['cd'],
-        ];
-    @endphp
-
     {{-- ── HERO ──────────────────────────────────────────── --}}
     <section class="about-hero" aria-labelledby="about-hero-title">
         <div class="container">
@@ -144,73 +128,26 @@
                 <p class="about-programs-intro">{{ __('front.about.programs_intro') }}</p>
             </header>
 
-            {{-- Programación y Desarrollo --}}
-            <div class="about-split reveal" aria-labelledby="program-pd-title">
-                <div class="about-split-media">
-                    <img src="{{ $programImages['pd'] }}"
-                        alt="{{ __('front.about.program_daw_img_alt') }}" width="800" height="600"
-                        loading="lazy">
+            @forelse ($categories as $category)
+                <div class="about-split reveal" @if ($loop->even) data-reverse @endif
+                    aria-labelledby="program-{{ $category->id }}-title">
+                    <div class="about-split-media">
+                        <img src="{{ $category->imageUrl($category->fallbackImage(), 'card') }}"
+                            alt="{{ $category->name }}" width="800" height="600" loading="lazy">
+                    </div>
+                    <div class="about-split-content">
+                        <span class="badge" data-type="category">{{ $category->badge }}</span>
+                        <h3 id="program-{{ $category->id }}-title">{{ $category->name }}</h3>
+                        <p>{{ $category->short_description }}</p>
+                        <a href="{{ route('projects.category', ['category' => $category->slug]) }}" class="btn"
+                            data-variant="ghost">
+                            {{ __('front.about.program_link') }}
+                        </a>
+                    </div>
                 </div>
-                <div class="about-split-content">
-                    <span class="badge" data-type="category">P&amp;D</span>
-                    <h3 id="program-pd-title">{{ __('front.about.program_daw_title') }}</h3>
-                    <p>{{ __('front.about.program_daw_desc') }}</p>
-                    <a href="{{ route('projects.category', ['category' => $categories->get(0)?->slug]) }}" class="btn" data-variant="ghost">
-                        {{ __('front.about.program_daw_link') }}
-                    </a>
-                </div>
-            </div>
-
-            {{-- Ciberseguridad --}}
-            <div class="about-split reveal" data-reverse aria-labelledby="program-cs-title">
-                <div class="about-split-media">
-                    <img src="{{ $programImages['cs'] }}"
-                        alt="{{ __('front.about.program_dam_img_alt') }}" width="800" height="600"
-                        loading="lazy">
-                </div>
-                <div class="about-split-content">
-                    <span class="badge" data-type="category">CS</span>
-                    <h3 id="program-cs-title">{{ __('front.about.program_dam_title') }}</h3>
-                    <p>{{ __('front.about.program_dam_desc') }}</p>
-                    <a href="{{ route('projects.category', ['category' => $categories->get(1)?->slug]) }}" class="btn" data-variant="ghost">
-                        {{ __('front.about.program_dam_link') }}
-                    </a>
-                </div>
-            </div>
-
-            {{-- Tecnologías Emergentes --}}
-            <div class="about-split reveal" aria-labelledby="program-te-title">
-                <div class="about-split-media">
-                    <img src="{{ $programImages['te'] }}"
-                        alt="{{ __('front.about.program_asir_img_alt') }}" width="800" height="600"
-                        loading="lazy">
-                </div>
-                <div class="about-split-content">
-                    <span class="badge" data-type="category">TE</span>
-                    <h3 id="program-te-title">{{ __('front.about.program_asir_title') }}</h3>
-                    <p>{{ __('front.about.program_asir_desc') }}</p>
-                    <a href="{{ route('projects.category', ['category' => $categories->get(2)?->slug]) }}" class="btn" data-variant="ghost">
-                        {{ __('front.about.program_asir_link') }}
-                    </a>
-                </div>
-            </div>
-
-            {{-- Competencias Digitales --}}
-            <div class="about-split reveal" data-reverse aria-labelledby="program-cd-title">
-                <div class="about-split-media">
-                    <img src="{{ $programImages['cd'] }}"
-                        alt="{{ __('front.about.program_smx_img_alt') }}" width="800" height="600"
-                        loading="lazy">
-                </div>
-                <div class="about-split-content">
-                    <span class="badge" data-type="category">CD</span>
-                    <h3 id="program-cd-title">{{ __('front.about.program_smx_title') }}</h3>
-                    <p>{{ __('front.about.program_smx_desc') }}</p>
-                    <a href="{{ route('projects.category', ['category' => $categories->get(3)?->slug]) }}" class="btn" data-variant="ghost">
-                        {{ __('front.about.program_smx_link') }}
-                    </a>
-                </div>
-            </div>
+            @empty
+                <p class="about-programs-intro">{{ __('front.about.programs_empty') }}</p>
+            @endforelse
 
         </div>
     </section>

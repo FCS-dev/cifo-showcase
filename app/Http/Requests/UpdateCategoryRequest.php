@@ -18,6 +18,12 @@ class UpdateCategoryRequest extends FormRequest
             'name' => ['required', 'array'],
             'name.es' => ['required', 'string', 'max:255'],
             'name.ca' => ['required', 'string', 'max:255'],
+            'badge' => ['required', 'array'],
+            'badge.es' => ['required', 'string', 'max:10'],
+            'badge.ca' => ['required', 'string', 'max:10'],
+            'short_description' => ['required', 'array'],
+            'short_description.es' => ['required', 'string', 'max:150'],
+            'short_description.ca' => ['required', 'string', 'max:150'],
             'image' => ['nullable', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             // 'icon' => ['required', 'string', 'max:255'],
         ];
