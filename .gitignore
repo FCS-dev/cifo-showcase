@@ -64,6 +64,8 @@ yarn-error.log*
 docker-compose.override.yml
 
 # --- Backups y temporales ---
+/storage/backups/
 *.bak
+*.bkp
 *.tmp
 *.log
