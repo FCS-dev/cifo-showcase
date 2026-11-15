@@ -274,7 +274,7 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--space-4);
-    margin: 0;
+    margin: var(--space-4) 0 0;
 }
 
 .project-detail-meta-item {

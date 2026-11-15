@@ -70,6 +70,7 @@ return [
         'sidebar_aria' => 'Información del proyecto',
         'meta_title' => 'Información',
         'meta_student' => 'Alumno/a',
+        'meta_teacher' => 'Docente',
         'meta_category' => 'Categoría',
         'meta_course' => 'Curso',
         'meta_year' => 'Año',

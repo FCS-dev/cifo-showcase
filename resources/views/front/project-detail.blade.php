@@ -5,6 +5,9 @@
     $courseName = $project->course?->name ?? $courseCode;
     $categoryName = $project->course?->category?->name ?? '';
     $year = $project->project_date?->year;
+    $teacherNames = $project->course
+        ? $project->course->teachers->pluck('name')->join(', ')
+        : '';
     $heroMedia = $project->getFeaturedImage();
     $heroUrl = $heroMedia?->getUrl() ?? asset('images/placeholder.webp');
     $allMedia = $project->getMedia('images');
@@ -119,7 +122,23 @@
                         <dl class="project-detail-meta">
 
                             <dt>{{ __('front.project.meta_student') }}</dt>
-                            <dd>{{ $project->students->pluck('name')->join(', ') ?: '—' }}</dd>
+                            <dd>
+                                @forelse ($project->students as $student)
+                                    <span>
+                                        {{ $student->name }}@if ($student->email) — {{ $student->email }}@endif
+                                    </span>
+                                    @if (!$loop->last)
+                                        <br>
+                                    @endif
+                                @empty
+                                    —
+                                @endforelse
+                            </dd>
+
+                            @if ($teacherNames)
+                                <dt>{{ __('front.project.meta_teacher') }}</dt>
+                                <dd>{{ $teacherNames }}</dd>
+                            @endif
 
                             @if ($categoryName)
                                 <dt>{{ __('front.project.meta_category') }}</dt>

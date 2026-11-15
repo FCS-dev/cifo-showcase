@@ -35,7 +35,7 @@ class ProjectController extends Controller
     public function show(string $locale, Project $project): View
     {
         // Laravel ya buscó el proyecto usando el slug porque es el segundo parámetro
-        $project->load(['students', 'course.category', 'media', 'tags']);
+        $project->load(['students', 'course.category', 'course.teachers', 'media', 'tags']);
 
         return view('front.project-detail', compact('project'));
     }
