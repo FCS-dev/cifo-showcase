@@ -5,6 +5,22 @@
 
 <x-layouts.app :title="__('front.about.page_title')" :description="__('front.about.page_desc')">
 
+    @php
+        $programFallbacks = [
+            'pd' => 'https://picsum.photos/seed/cifo-pd/800/600',
+            'cs' => 'https://picsum.photos/seed/cifo-cs/800/600',
+            'te' => 'https://picsum.photos/seed/cifo-te/800/600',
+            'cd' => 'https://picsum.photos/seed/cifo-cd/800/600',
+        ];
+
+        $programImages = [
+            'pd' => $categories->get(0)?->imageUrl($programFallbacks['pd'], 'card') ?? $programFallbacks['pd'],
+            'cs' => $categories->get(1)?->imageUrl($programFallbacks['cs'], 'card') ?? $programFallbacks['cs'],
+            'te' => $categories->get(2)?->imageUrl($programFallbacks['te'], 'card') ?? $programFallbacks['te'],
+            'cd' => $categories->get(3)?->imageUrl($programFallbacks['cd'], 'card') ?? $programFallbacks['cd'],
+        ];
+    @endphp
+
     {{-- ── HERO ──────────────────────────────────────────── --}}
     <section class="about-hero" aria-labelledby="about-hero-title">
         <div class="container">
@@ -37,8 +53,8 @@
             {{-- Misión --}}
             <div class="about-split reveal">
                 <div class="about-split-media">
-                    <img src="https://picsum.photos/seed/cifo-mission/800/600"
-                        alt="{{ __('front.about.mission_img_alt') }}" width="800" height="600" loading="lazy">
+                    <x-front.site-image name="about_mission" :alt="__('front.about.mission_img_alt')" width="800"
+                        height="600" loading="lazy" />
                 </div>
                 <div class="about-split-content">
                     <div class="about-split-icon" aria-hidden="true">
@@ -64,8 +80,8 @@
             {{-- Visión --}}
             <div class="about-split reveal" data-reverse>
                 <div class="about-split-media">
-                    <img src="https://picsum.photos/seed/cifo-vision/800/600"
-                        alt="{{ __('front.about.vision_img_alt') }}" width="800" height="600" loading="lazy">
+                    <x-front.site-image name="about_vision" :alt="__('front.about.vision_img_alt')" width="800"
+                        height="600" loading="lazy" />
                 </div>
                 <div class="about-split-content">
                     <div class="about-split-icon" aria-hidden="true">
@@ -131,7 +147,7 @@
             {{-- Programación y Desarrollo --}}
             <div class="about-split reveal" aria-labelledby="program-pd-title">
                 <div class="about-split-media">
-                    <img src="https://picsum.photos/seed/cifo-pd/800/600"
+                    <img src="{{ $programImages['pd'] }}"
                         alt="{{ __('front.about.program_daw_img_alt') }}" width="800" height="600"
                         loading="lazy">
                 </div>
@@ -148,7 +164,7 @@
             {{-- Ciberseguridad --}}
             <div class="about-split reveal" data-reverse aria-labelledby="program-cs-title">
                 <div class="about-split-media">
-                    <img src="https://picsum.photos/seed/cifo-cs/800/600"
+                    <img src="{{ $programImages['cs'] }}"
                         alt="{{ __('front.about.program_dam_img_alt') }}" width="800" height="600"
                         loading="lazy">
                 </div>
@@ -165,7 +181,7 @@
             {{-- Tecnologías Emergentes --}}
             <div class="about-split reveal" aria-labelledby="program-te-title">
                 <div class="about-split-media">
-                    <img src="https://picsum.photos/seed/cifo-te/800/600"
+                    <img src="{{ $programImages['te'] }}"
                         alt="{{ __('front.about.program_asir_img_alt') }}" width="800" height="600"
                         loading="lazy">
                 </div>
@@ -182,7 +198,7 @@
             {{-- Competencias Digitales --}}
             <div class="about-split reveal" data-reverse aria-labelledby="program-cd-title">
                 <div class="about-split-media">
-                    <img src="https://picsum.photos/seed/cifo-cd/800/600"
+                    <img src="{{ $programImages['cd'] }}"
                         alt="{{ __('front.about.program_smx_img_alt') }}" width="800" height="600"
                         loading="lazy">
                 </div>

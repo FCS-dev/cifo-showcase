@@ -47,11 +47,16 @@ class RolesAndPermissionsSeeder extends Seeder
             Permission::where('name', 'not like', 'users.%')
                 ->where('name', 'not like', 'roles.%')
                 ->where('name', 'not like', 'permissions.%')
+                ->where('name', 'not like', 'institutional.%')
                 ->get()
         );
 
         // VIEWER: Solo lectura
         $viewer = Role::firstOrCreate(['name' => 'Viewer', 'guard_name' => 'web']);
-        $viewer->syncPermissions(Permission::where('name', 'like', '%.view')->get());
+        $viewer->syncPermissions(
+            Permission::where('name', 'like', '%.view')
+                ->where('name', 'not like', 'institutional.%')
+                ->get()
+        );
     }
 }

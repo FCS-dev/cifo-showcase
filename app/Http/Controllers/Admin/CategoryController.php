@@ -31,6 +31,7 @@ class CategoryController extends Controller
         $locale = app()->getLocale();
 
         $categories = Category::query()
+            ->with('media')
             ->withCount('courses')
             ->when($search, fn ($q) => $q->whereRaw(
                 "LOWER(`name`->>'$.{$locale}') LIKE ?",
@@ -54,7 +55,14 @@ class CategoryController extends Controller
     {
         Gate::authorize('categories.create');
 
-        Category::create($request->validated());
+        $validated = $request->validated();
+        unset($validated['image']);
+
+        $category = Category::create($validated);
+
+        if ($request->hasFile('image')) {
+            $category->addMedia($request->file('image'))->toMediaCollection('image');
+        }
 
         session()->flash('success', __('admin.categories.created'));
 
@@ -76,7 +84,15 @@ class CategoryController extends Controller
     {
         Gate::authorize('categories.update');
 
-        $category->update($request->validated());
+        $validated = $request->validated();
+        unset($validated['image']);
+
+        $category->update($validated);
+
+        if ($request->hasFile('image')) {
+            $category->clearMediaCollection('image');
+            $category->addMedia($request->file('image'))->toMediaCollection('image');
+        }
 
         session()->flash('success', __('admin.categories.updated'));
 
@@ -85,6 +101,17 @@ class CategoryController extends Controller
         }
 
         return redirect()->route('categories.index');
+    }
+
+    public function destroyImage(Category $category): RedirectResponse
+    {
+        Gate::authorize('categories.update');
+
+        $category->clearMediaCollection('image');
+
+        return redirect()
+            ->route('categories.edit', $category)
+            ->with('success', __('admin.categories.image_deleted'));
     }
 
     public function destroy(Category $category): RedirectResponse

@@ -15,21 +15,18 @@
         </p>
     </div>
 
-    <x-admin.ui.card class="max-w-lg">
-        <form method="POST" action="{{ route('categories.update', $category) }}" novalidate x-data="{
-            form: $form('patch', '{{ route('categories.update', $category) }}', {
-                name: {
-                    es: @js($category->getTranslation('name', 'es', false)),
-                    ca: @js($category->getTranslation('name', 'ca', false))
-                }
-            })
-        }"
-            @submit.prevent="form.submit({ onSuccess: () => window.location.href = '{{ route('categories.index') }}' })">
+    <x-admin.ui.card class="max-w-lg" x-data="{}">
+        <form method="POST" action="{{ route('categories.update', $category) }}" enctype="multipart/form-data" x-data="{}">
             @csrf
             @method('PATCH')
 
-            <x-admin.ui.translatable-input name="name" :label="__('admin.categories.col_name')" icon="icofont-sub-listing" :required="true"
-                :value-es="old('name.es', $category->getTranslation('name', 'es', false))" :value-ca="old('name.ca', $category->getTranslation('name', 'ca', false))" form-var="form" />
+            <x-admin.ui.translatable-input name="name" :label="__('admin.categories.col_name')" icon="icofont-sub-listing"
+                :required="true" :value-es="old('name.es', $category->getTranslation('name', 'es', false))" :value-ca="old('name.ca', $category->getTranslation('name', 'ca', false))" />
+
+            <div class="mt-6">
+                <x-admin.media.single-uploader name="image" :label="__('admin.categories.image')" :help="__('admin.categories.image_help')"
+                    :current-url="$category->imageUrl(asset('img/image-placeholder.svg'), 'thumb')" accept="image/jpeg,image/png,image/webp" />
+            </div>
 
             <div class="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-xs opacity-50">
                 <span><i class="icofont-calendar"></i> {{ __('admin.common.created_at') }}:
@@ -42,11 +39,34 @@
                 <x-admin.ui.button variant="ghost" :href="route('categories.index')">
                     {{ __('admin.common.cancel') }}
                 </x-admin.ui.button>
-                <x-admin.ui.button type="submit" icon="icofont-check-circled" x-bind:loading="form.processing">
+                <x-admin.ui.button type="submit" icon="icofont-check-circled">
                     {{ __('admin.common.save_changes') }}
                 </x-admin.ui.button>
             </div>
         </form>
+
+        @if ($category->getFirstMedia('image'))
+            <div class="mt-6 flex justify-end border-t border-base-300 pt-4">
+                <x-admin.ui.button type="button" variant="error" :outline="true" icon="icofont-trash"
+                    onclick="document.getElementById('delete-category-image').showModal()">
+                    {{ __('admin.categories.delete_image') }}
+                </x-admin.ui.button>
+            </div>
+
+            <x-admin.ui.modal id="delete-category-image" :title="__('admin.categories.delete_image_modal_title')" size="sm">
+                <p class="text-sm">{{ __('admin.categories.delete_image_help') }}</p>
+                <x-slot name="actions">
+                    <form method="dialog">
+                        <button class="btn btn-ghost">{{ __('admin.common.cancel') }}</button>
+                    </form>
+                    <form method="POST" action="{{ route('categories.image.destroy', $category) }}">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-error">{{ __('admin.common.delete') }}</button>
+                    </form>
+                </x-slot>
+            </x-admin.ui.modal>
+        @endif
     </x-admin.ui.card>
 
 </x-layouts.admin>

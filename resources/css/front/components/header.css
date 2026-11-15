@@ -28,6 +28,14 @@
     transition: opacity var(--transition-fast);
 }
 
+.header-logo img {
+    display: block;
+    height: 48px;
+    width: auto;
+    max-width: 200px;
+    object-fit: contain;
+}
+
 .header-logo:hover {
     opacity: 0.85;
 }

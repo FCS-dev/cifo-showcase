@@ -117,6 +117,26 @@
                 @endcanany
             @endcanany
 
+            {{-- Sección Institucional --}}
+            @can('institutional.view')
+                <li
+                    class="menu-title mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-widest text-neutral-content/50">
+                    {{ __('admin.nav.institutional_section') }}
+                </li>
+
+                <li>
+                    <a href="{{ route('institutional.index') }}" @class([
+                        'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors',
+                        'bg-primary text-primary-content font-semibold' => request()->routeIs(
+                            'institutional.*'),
+                        'hover:bg-neutral-content/10' => !request()->routeIs('institutional.*'),
+                    ])>
+                        <i class="icofont-institution text-lg w-5 text-center" aria-hidden="true"></i>
+                        <span>{{ __('admin.nav.institutional_images') }}</span>
+                    </a>
+                </li>
+            @endcan
+
             {{-- Sección Contenido --}}
             @canany(['categories.view', 'courses.view', 'tags.view', 'projects.view'])
                 <li

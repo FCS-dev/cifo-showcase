@@ -18,6 +18,7 @@ class UpdateCategoryRequest extends FormRequest
             'name' => ['required', 'array'],
             'name.es' => ['required', 'string', 'max:255'],
             'name.ca' => ['required', 'string', 'max:255'],
+            'image' => ['nullable', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             // 'icon' => ['required', 'string', 'max:255'],
         ];
     }

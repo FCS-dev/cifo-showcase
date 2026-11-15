@@ -19,8 +19,7 @@
                 {{-- Logo --}}
                 <a href="{{ route('home') }}" class="header-logo"
                     aria-label="{{ config('app.name') }} — {{ __('front.nav.home') }}">
-                    <img src="{{ asset('img/logo-placeholder.svg') }}" alt="{{ config('app.name') }}" width="200"
-                        height="48">
+                    <x-front.site-image name="header_logo" :alt="config('app.name')" width="200" height="48" />
                 </a>
 
                 {{-- Desktop nav --}}

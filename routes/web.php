@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\InstitutionalImageController;
 use App\Http\Controllers\Admin\LocaleController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\ProfileController;
@@ -45,12 +46,23 @@ Route::middleware(['auth', 'verified', 'admin.locale'])
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
 
+        Route::get('/institutional', [InstitutionalImageController::class, 'index'])
+            ->name('institutional.index');
+        Route::get('/institutional/{siteImage:key}/edit', [InstitutionalImageController::class, 'edit'])
+            ->name('institutional.edit');
+        Route::put('/institutional/{siteImage:key}', [InstitutionalImageController::class, 'update'])
+            ->name('institutional.update');
+        Route::delete('/institutional/{siteImage:key}/image', [InstitutionalImageController::class, 'destroyImage'])
+            ->name('institutional.image.destroy');
+
         Route::resource('users', UserController::class);
         Route::resource('roles', RoleController::class)->except('show');
         Route::resource('courses', CourseController::class)->except('show');
         Route::resource('tags', TagController::class)->except('show');
         Route::resource('projects', AdminProjectController::class)->names('admin.projects');
         Route::resource('permissions', PermissionController::class)->except('show');
+        Route::delete('/categories/{category}/image', [CategoryController::class, 'destroyImage'])
+            ->name('categories.image.destroy');
         Route::resource('categories', CategoryController::class)->except('show');
         Route::resource('students', StudentController::class)->except('show');
         Route::resource('teachers', TeacherController::class)->except('show');

@@ -27,6 +27,7 @@
             <x-admin.table.filters :action="route('categories.index')" :search-placeholder="__('admin.categories.search_placeholder')" />
 
             <x-admin.table.index :items="$categories" :columns="[
+                ['label' => __('admin.categories.col_image'), 'key' => null, 'sortable' => false],
                 ['label' => __('admin.categories.col_name'), 'key' => null, 'sortable' => false],
                 // ['label' => __('admin.categories.col_icon'),    'key' => null,         'sortable' => false],
                 ['label' => __('admin.categories.col_courses'), 'key' => null, 'sortable' => false],
@@ -36,6 +37,20 @@
 
                 @foreach ($categories as $category)
                     <tr class="hover">
+                        <td>
+                            <div class="flex flex-col items-center gap-1">
+                                <img src="{{ $category->imageUrl(asset('img/image-placeholder.svg'), 'thumb') }}"
+                                    alt="{{ $category->name }}"
+                                    class="w-16 h-12 rounded-lg border border-base-300 bg-base-200 object-cover">
+
+                                @unless ($category->getFirstMedia('image'))
+                                    <span class="badge badge-ghost badge-xs whitespace-nowrap">
+                                        {{ __('admin.categories.no_image') }}
+                                    </span>
+                                @endunless
+                            </div>
+                        </td>
+
                         <td class="font-medium">{{ $category->name }}</td>
 
                         {{-- <td>

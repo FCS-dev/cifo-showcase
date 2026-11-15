@@ -12,22 +12,23 @@
     </div>
 
     <x-admin.ui.card class="max-w-lg">
-        <form method="POST" action="{{ route('categories.store') }}" novalidate x-data="{
-            form: $form('post', '{{ route('categories.store') }}', {
-                name: { es: '', ca: '' }
-            })
-        }"
-            @submit.prevent="form.submit({ onSuccess: () => window.location.href = '{{ route('categories.index') }}' })">
+        <form method="POST" action="{{ route('categories.store') }}" enctype="multipart/form-data" x-data="{}">
             @csrf
 
-            <x-admin.ui.translatable-input name="name" :label="__('admin.categories.col_name')" icon="icofont-sub-listing" :placeholder="__('admin.categories.name_placeholder')"
-                :required="true" form-var="form" />
+            <x-admin.ui.translatable-input name="name" :label="__('admin.categories.col_name')" icon="icofont-sub-listing"
+                :placeholder="__('admin.categories.name_placeholder')" :value-es="old('name.es', '')" :value-ca="old('name.ca', '')"
+                :required="true" />
+
+            <div class="mt-6">
+                <x-admin.media.single-uploader name="image" :label="__('admin.categories.image')" :help="__('admin.categories.image_help')"
+                    :current-url="asset('img/image-placeholder.svg')" accept="image/jpeg,image/png,image/webp" />
+            </div>
 
             <div class="flex justify-end gap-2 mt-8 pt-4 border-t border-base-300">
                 <x-admin.ui.button variant="ghost" :href="route('categories.index')">
                     {{ __('admin.common.cancel') }}
                 </x-admin.ui.button>
-                <x-admin.ui.button type="submit" icon="icofont-check-circled" x-bind:loading="form.processing">
+                <x-admin.ui.button type="submit" icon="icofont-check-circled">
                     {{ __('admin.categories.create_btn') }}
                 </x-admin.ui.button>
             </div>

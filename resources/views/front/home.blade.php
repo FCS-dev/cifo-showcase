@@ -87,8 +87,8 @@
                 </div>
 
                 <figure class="about-teaser-figure">
-                    <img src="https://picsum.photos/seed/cifo-building/800/600"
-                        alt="{{ __('front.home.teaser_img_alt') }}" width="800" height="600" loading="lazy">
+                    <x-front.site-image name="home_about" :alt="__('front.home.teaser_img_alt')" width="800"
+                        height="600" loading="lazy" />
                 </figure>
 
             </div>
