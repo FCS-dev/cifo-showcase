@@ -1,5 +1,14 @@
 # 📒 SHOWCASE — Plataforma de Portafolios Institucionales
 
+> **Aviso:** Este repositorio es un fork independiente de
+> [cifo-showcase-app](https://github.com/germansango01/cifo-showcase-app),
+> el proyecto original en el que participé como integrante. Esta versión
+> incorpora algunas variaciones propias y no es el repositorio oficial del
+> proyecto original.
+>
+> El crédito por el proyecto original y su base sigue siendo de
+> **Germán Contreras** y **Franco Calderón**.
+
 ## Curs Confecció i Publicació de Pàgines Web 2026
 
 ### CIFO Barcelona La Violeta
@@ -456,9 +465,9 @@ Profesor: Manel Plaza
 
 ---
 
-## 🔗 Link del repositorio
+## 🔗 Repositorio original
 
-[Repositorio GitHub](https://github.com/germansango01/cifo-showcase-app.git)
+[Repositorio original](https://github.com/germansango01/cifo-showcase-app.git)
 
 ---
 
