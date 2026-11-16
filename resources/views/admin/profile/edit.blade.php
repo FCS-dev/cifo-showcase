@@ -25,9 +25,16 @@
                 form: $form('post', '/user/profile-information', {
                     name: '{{ old('name', $user->name) }}',
                     email: '{{ old('email', $user->email) }}',
-                })
+                }),
+                submit() {
+                    this.form.submit()
+                        .then((response) => {
+                            window.location.href = response?.data?.redirect ?? '{{ route('profile.edit') }}';
+                        })
+                        .catch(() => {});
+                }
             }"
-                @submit.prevent="form.submit()">
+                @submit.prevent="submit()">
                 @csrf
                 @method('PUT')
 
@@ -38,12 +45,6 @@
                 @if ($errors->updateProfileInformation->any())
                     <x-admin.ui.alert type="error" dismissible class="mb-4">
                         {{ $errors->updateProfileInformation->first() }}
-                    </x-admin.ui.alert>
-                @endif
-
-                @if (session('status') === 'profile-information-updated')
-                    <x-admin.ui.alert type="success" dismissible class="mb-4">
-                        {{ __('admin.profile.updated') }}
                     </x-admin.ui.alert>
                 @endif
 
@@ -85,8 +86,15 @@
                     current_password: '',
                     password: '',
                     password_confirmation: '',
-                })
-            }" @submit.prevent="form.submit()">
+                }),
+                submit() {
+                    this.form.submit()
+                        .then((response) => {
+                            window.location.href = response?.data?.redirect ?? '{{ route('dashboard') }}';
+                        })
+                        .catch(() => {});
+                }
+            }" @submit.prevent="submit()">
                 @csrf
                 @method('PUT')
 
@@ -97,12 +105,6 @@
                 @if ($errors->updatePassword->any())
                     <x-admin.ui.alert type="error" dismissible class="mb-4">
                         {{ $errors->updatePassword->first() }}
-                    </x-admin.ui.alert>
-                @endif
-
-                @if (session('status') === 'password-updated')
-                    <x-admin.ui.alert type="success" dismissible class="mb-4">
-                        {{ __('admin.profile.password_updated') }}
                     </x-admin.ui.alert>
                 @endif
 

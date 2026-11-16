@@ -79,8 +79,4 @@
         </form>
     </div>
 
-    <div class="divider text-xs opacity-50 mt-4">{{ __('admin.auth.new_user') }}</div>
-    <a href="{{ route('register') }}" class="btn btn-outline btn-block">
-        <i class="icofont-ui-user"></i> {{ __('admin.auth.register_link') }}
-    </a>
 </x-layouts.guest>
