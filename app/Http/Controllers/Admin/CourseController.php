@@ -36,7 +36,7 @@ class CourseController extends Controller
             ->with('category')
             ->withCount('projects')
             ->when($search, fn ($q) => $q->where(function ($q) use ($search, $locale) {
-                $q->whereRaw("LOWER(`name`->>'$.{$locale}') LIKE ?", [mb_strtolower("%{$search}%")])
+                $q->whereRaw('LOWER(JSON_UNQUOTE(JSON_EXTRACT(`name`, ?))) LIKE ?', ['$.'.$locale, mb_strtolower("%{$search}%")])
                     ->orWhere('course_code', 'like', mb_strtolower("%{$search}%"));
             }))
             ->when($categoryId, fn ($q) => $q->where('category_id', $categoryId))

@@ -34,8 +34,8 @@ class CategoryController extends Controller
             ->with('media')
             ->withCount('courses')
             ->when($search, fn ($q) => $q->whereRaw(
-                "LOWER(`name`->>'$.{$locale}') LIKE ?",
-                [mb_strtolower("%{$search}%")]
+                'LOWER(JSON_UNQUOTE(JSON_EXTRACT(`name`, ?))) LIKE ?',
+                ['$.'.$locale, mb_strtolower("%{$search}%")]
             ))
             ->orderBy($sort, $direction)
             ->paginate($perPage)

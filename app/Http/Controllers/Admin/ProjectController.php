@@ -42,8 +42,8 @@ class ProjectController extends Controller
         $projects = Project::query()
             ->with(['course', 'tags'])
             ->when($search, fn ($q) => $q->whereRaw(
-                "LOWER(`title`->>'$.{$locale}') LIKE ?",
-                [mb_strtolower("%{$search}%")]
+                'LOWER(JSON_UNQUOTE(JSON_EXTRACT(`title`, ?))) LIKE ?',
+                ['$.'.$locale, mb_strtolower("%{$search}%")]
             ))
             ->when($statusFilter, fn ($q) => $q->where('status', $statusFilter))
             ->when($courseFilter, fn ($q) => $q->where('course_id', $courseFilter))

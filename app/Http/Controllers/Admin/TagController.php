@@ -33,8 +33,8 @@ class TagController extends Controller
         $tags = Tag::query()
             ->withCount('projects')
             ->when($search, fn ($q) => $q->whereRaw(
-                "LOWER(`name`->>'$.{$locale}') LIKE ?",
-                [mb_strtolower("%{$search}%")]
+                'LOWER(JSON_UNQUOTE(JSON_EXTRACT(`name`, ?))) LIKE ?',
+                ['$.'.$locale, mb_strtolower("%{$search}%")]
             ))
             ->orderBy($sort, $direction)
             ->paginate($perPage)

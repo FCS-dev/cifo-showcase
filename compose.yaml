@@ -24,9 +24,10 @@ services:
         networks:
             - sail
         depends_on:
-            - mysql
+            mysql:
+                condition: service_healthy
     mysql:
-        image: "mysql:8.4"
+        image: "mariadb:10.5.29"
         ports:
             - "${FORWARD_DB_PORT:-3306}:3306"
         environment:
@@ -35,24 +36,20 @@ services:
             MYSQL_DATABASE: "${DB_DATABASE}"
             MYSQL_USER: "${DB_USERNAME}"
             MYSQL_PASSWORD: "${DB_PASSWORD}"
-            MYSQL_ALLOW_EMPTY_PASSWORD: 1
-            MYSQL_EXTRA_OPTIONS: "${MYSQL_EXTRA_OPTIONS:-}"
         volumes:
-            - "sail-mysql:/var/lib/mysql"
-            - "./vendor/laravel/sail/database/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh"
+            - "sail-mariadb:/var/lib/mysql"
+            - "./docker/mariadb/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh:ro"
         networks:
             - sail
         healthcheck:
-            test:
-                - CMD
-                - mysqladmin
-                - ping
-                - "-p${DB_PASSWORD}"
-            retries: 3
+            test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+            start_period: 30s
+            interval: 5s
             timeout: 5s
+            retries: 10
 networks:
     sail:
         driver: bridge
 volumes:
-    sail-mysql:
+    sail-mariadb:
         driver: local
