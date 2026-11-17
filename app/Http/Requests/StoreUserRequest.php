@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
 class StoreUserRequest extends FormRequest
@@ -19,7 +20,7 @@ class StoreUserRequest extends FormRequest
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()],
             'roles' => ['nullable', 'array'],
-            'roles.*' => ['string', 'exists:roles,name'],
+            'roles.*' => ['string', 'exists:roles,name', Rule::notIn(['Admin'])],
         ];
     }
 
@@ -35,6 +36,7 @@ class StoreUserRequest extends FormRequest
             'password.confirmed' => 'Las contraseñas no coinciden.',
             'roles.array' => 'El formato de roles no es válido.',
             'roles.*.exists' => 'Uno o más roles seleccionados no existen.',
+            'roles.*.not_in' => 'El rol Admin no puede asignarse a nuevos usuarios.',
         ];
     }
 }

@@ -215,6 +215,7 @@ return [
         'protected' => 'Protegit',
         'account_actions' => 'Accions de l\'usuari',
         'email' => 'Correu electrònic',
+        'email_locked' => 'El correu electrònic només es pot definir en crear el compte.',
         'password' => 'Contrasenya',
         'password_confirm' => 'Confirmar contrasenya',
         'verified' => 'Verificat',

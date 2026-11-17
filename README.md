@@ -249,32 +249,74 @@ Configurar:
 - conexión a base de datos
 - parámetros del servidor Apache
 - URL base de la aplicación
+- `APP_ENV`, `APP_DEBUG`, `ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`
 
 ---
 
-### 3. Generar dependencias y entorno Laravel
+### 3. Instalación en desarrollo
 
-Ejecutar:
+Con la base de datos de desarrollo configurada:
 
 ```bash
+composer install
 php artisan key:generate
-composer update
-php artisan migrate:fresh --seed
-php artisan optimize:clear
+php artisan migrate:fresh
+php artisan db:seed
+php artisan db:seed --class=DemoSeeder   # opcional: usuarios y contenido de prueba
 php artisan storage:link
-npm install
+npm ci
 npm run build
+```
+
+`db:seed` es seguro en cualquier entorno: crea permisos, el rol `Admin`, el primer usuario Admin, las categorías base y las filas de `SiteImage`, sin datos demo.
+
+Si usas Docker, ejecuta los comandos dentro de `laravel.test`:
+
+```bash
+docker compose exec -u sail laravel.test php artisan migrate:fresh
+docker compose exec -u sail laravel.test php artisan db:seed
+docker compose exec -u sail laravel.test php artisan db:seed --class=DemoSeeder
 ```
 
 ---
 
-### 4. Acceder a la aplicación
+### 4. Instalación en producción
+
+En el `.env` del servidor:
+
+```env
+APP_ENV=production
+APP_DEBUG=false
+ADMIN_NAME=...
+ADMIN_EMAIL=...
+ADMIN_PASSWORD=...
+```
+
+`ADMIN_*` solo se usan para crear el primer usuario Admin cuando no existe ninguno.
+
+```bash
+composer install --no-dev --optimize-autoloader
+php artisan key:generate
+php artisan migrate --force
+php artisan db:seed --force
+php artisan storage:link
+php artisan config:cache
+php artisan route:cache
+npm ci
+npm run build
+```
+
+No ejecutes `DemoSeeder` en producción: aborta automáticamente.
+
+---
+
+### 5. Acceder a la aplicación
 
 Abrir en navegador:
 
 ```text
 Depende de server local XAMPP:
-http://localhost/carpeta/plublic/es
+http://localhost/carpeta/public/es
 
 Si tienen configurado un virtualhost Local:
 http://cifoapp.test
@@ -284,10 +326,25 @@ http://cifoapp.test
 
 ## 🔐 Acceso por defecto
 
+En desarrollo, los valores por defecto son:
+
 ```text
 Usuario: admin@cifo.com
 Password: admin123
 ```
+
+En producción se definen con `ADMIN_NAME`, `ADMIN_EMAIL` y `ADMIN_PASSWORD` antes del primer `db:seed`.
+
+### Credenciales del Admin
+
+- `ADMIN_*` solo se usan la primera vez, cuando no existe ningún usuario con rol `Admin`.
+- Después del primer arranque, la fuente de verdad es la base de datos.
+- El nombre y la contraseña pueden cambiarse desde “Mi perfil”; el `.env` deja de reflejarlos.
+- El correo electrónico es inmutable: solo se define al crear la cuenta.
+- Reejecutar `db:seed` no duplica usuarios ni roles y no sobreescribe credenciales existentes.
+- El rol `Admin` no se puede asignar, quitar, eliminar ni transferir desde la aplicación.
+- Para dar privilegios totales a otro usuario, crea un rol propio (por ejemplo `SUPERVISOR`) y asígnale todos los permisos. Ese rol no recibe automáticamente los permisos nuevos.
+- Si se modifica el `.env` en el servidor, ejecuta `php artisan config:cache` (o `config:clear`) para recargar la configuración.
 
 ---
 

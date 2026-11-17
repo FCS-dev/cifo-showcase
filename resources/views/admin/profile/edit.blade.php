@@ -24,7 +24,6 @@
             <form method="POST" action="/user/profile-information" x-data="{
                 form: $form('post', '/user/profile-information', {
                     name: '{{ old('name', $user->name) }}',
-                    email: '{{ old('email', $user->email) }}',
                 }),
                 submit() {
                     this.form.submit()
@@ -52,7 +51,7 @@
                     <x-admin.ui.input name="name" :label="__('admin.users.full_name')" icon="icofont-ui-user" :value="$user->name" required
                         x-model="form.name" @change="form.validate('name')" />
                     <x-admin.ui.input name="email" type="email" :label="__('admin.common.email')" icon="icofont-email"
-                        :value="$user->email" required x-model="form.email" @change="form.validate('email')" />
+                        :value="$user->email" disabled :help="__('admin.common.email_locked')" />
                 </div>
 
                 @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && !$user->hasVerifiedEmail())

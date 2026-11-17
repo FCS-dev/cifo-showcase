@@ -46,12 +46,18 @@ class CategorySeeder extends Seeder
         ];
 
         foreach ($categories as $data) {
+            $slug = Str::slug($data['name']['es']);
+
+            if (Category::where('slug->es', $slug)->exists()) {
+                continue;
+            }
+
             Category::create([
                 'name' => $data['name'],
                 'badge' => $data['badge'],
                 'short_description' => $data['short_description'],
                 'slug' => [
-                    'es' => Str::slug($data['name']['es']),
+                    'es' => $slug,
                     'ca' => Str::slug($data['name']['ca']),
                 ],
             ]);

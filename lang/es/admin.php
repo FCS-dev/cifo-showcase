@@ -215,6 +215,7 @@ return [
         'protected' => 'Protegido',
         'account_actions' => 'Acciones del usuario',
         'email' => 'Correo electrónico',
+        'email_locked' => 'El correo electrónico solo puede definirse al crear la cuenta.',
         'password' => 'Contraseña',
         'password_confirm' => 'Confirmar contraseña',
         'verified' => 'Verificado',

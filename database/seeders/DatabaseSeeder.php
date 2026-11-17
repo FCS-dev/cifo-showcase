@@ -8,21 +8,14 @@ class DatabaseSeeder extends Seeder
 {
     /**
      * Seed the application's database.
+     *
+     * This seeder is always production-safe. Demo data lives in DemoSeeder
+     * and must be executed explicitly:
+     *
+     *     php artisan db:seed --class=DemoSeeder
      */
     public function run(): void
     {
-        $this->call([
-            RolesAndPermissionsSeeder::class,
-            InstitutionalSeeder::class,
-            UserSeeder::class,
-            CategorySeeder::class,
-            CategoryContentSeeder::class,
-            TagSeeder::class,
-            TeacherSeeder::class,
-            StudentSeeder::class,
-            CourseSeeder::class,
-            ProjectSeeder::class,
-            ProjectMediaSeeder::class,
-        ]);
+        $this->call(ProductionSeeder::class);
     }
 }

@@ -169,7 +169,7 @@
                         @endcan
 
                         @can('users.delete')
-                            @if (auth()->id() !== $user->id)
+                            @if (auth()->id() !== $user->id && ! $user->isAdmin())
                                 <button type="button" class="btn btn-error btn-outline btn-block"
                                     onclick="confirm-delete-show.showModal()"
                                     aria-label="{{ __('admin.users.delete_btn') }} {{ $user->name }}">
@@ -185,7 +185,7 @@
 
     {{-- Modal confirmación delete --}}
     @can('users.delete')
-        @if (auth()->id() !== $user->id)
+        @if (auth()->id() !== $user->id && ! $user->isAdmin())
             <x-admin.ui.modal id="confirm-delete-show" :title="__('admin.users.delete_modal_title')" size="sm">
                 <p class="text-sm opacity-80 mb-1">
                     {{ __('admin.users.delete_confirm_short') }} <strong>{{ $user->name }}</strong>?

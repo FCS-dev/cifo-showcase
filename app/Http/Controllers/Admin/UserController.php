@@ -59,7 +59,7 @@ class UserController extends Controller
     {
         Gate::authorize('users.create');
 
-        $roles = Role::all();
+        $roles = Role::where('name', '!=', 'Admin')->orderBy('name')->get();
 
         return view('admin.users.create', compact('roles'));
     }
@@ -76,7 +76,15 @@ class UserController extends Controller
 
         if ($request->has('roles')) {
             Gate::authorize('users.assign-roles');
-            $user->assignRole($request->roles);
+
+            $roles = collect($request->input('roles', []))
+                ->reject(fn (string $role) => $role === 'Admin')
+                ->values()
+                ->all();
+
+            if ($roles !== []) {
+                $user->assignRole($roles);
+            }
         }
 
         session()->flash('success', 'Usuario creado correctamente.');
@@ -107,7 +115,10 @@ class UserController extends Controller
     {
         Gate::authorize('users.update');
 
-        $roles = Role::all();
+        $roles = $user->isAdmin()
+            ? Role::orderBy('name')->get()
+            : Role::where('name', '!=', 'Admin')->orderBy('name')->get();
+
         $userRoleNames = $user->roles->pluck('name')->toArray();
 
         return view('admin.users.edit', compact('user', 'roles', 'userRoleNames'));
@@ -117,7 +128,7 @@ class UserController extends Controller
     {
         Gate::authorize('users.update');
 
-        $user->update($request->only('name', 'email'));
+        $user->update($request->only('name'));
 
         if ($request->filled('password')) {
             $user->update(['password' => Hash::make($request->password)]);
@@ -125,7 +136,16 @@ class UserController extends Controller
 
         if ($request->has('roles')) {
             Gate::authorize('users.assign-roles');
-            $user->syncRoles($request->roles);
+
+            $roles = collect($request->input('roles', []))
+                ->reject(fn (string $role) => $role === 'Admin')
+                ->values();
+
+            if ($user->isAdmin()) {
+                $roles->push('Admin');
+            }
+
+            $user->syncRoles($roles->unique()->values()->all());
         }
 
         session()->flash('success', 'Usuario actualizado correctamente.');
@@ -141,9 +161,9 @@ class UserController extends Controller
     {
         Gate::authorize('users.delete');
 
-        // Protección para el administrador principal
+        // El rol Admin no puede eliminarse ni transferirse
         if ($user->isAdmin()) {
-            return back()->with('error', 'No se puede eliminar al administrador principal del sistema.');
+            return back()->with('error', 'No se puede eliminar a un usuario administrador.');
         }
 
         $user->delete();

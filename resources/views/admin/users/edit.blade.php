@@ -15,10 +15,9 @@
         <form method="POST" action="{{ route('users.update', $user) }}" novalidate x-data="{
             form: $form('patch', '{{ route('users.update', $user) }}', {
                 name: '{{ addslashes($user->name) }}',
-                email: '{{ $user->email }}',
                 password: '',
                 password_confirmation: '',
-                roles: {{ Js::from($user->roles->pluck('name')) }}
+                roles: {{ Js::from($user->roles->pluck('name')->reject(fn ($name) => $name === 'Admin')->values()) }}
             })
         }"
             @submit.prevent="form.submit({ onSuccess: () => window.location.href = '{{ route('users.index') }}' })">
@@ -31,7 +30,7 @@
                     :required="true" x-model="form.name" @change="form.validate('name')" />
 
                 <x-admin.ui.input name="email" :label="__('admin.common.email')" type="email" icon="icofont-email" :value="$user->email"
-                    :required="true" x-model="form.email" @change="form.validate('email')" />
+                    disabled :help="__('admin.common.email_locked')" />
             </div>
 
             {{-- Contraseña (opcional) --}}
@@ -52,28 +51,28 @@
                 <div class="mt-6">
                     <fieldset class="fieldset">
                         <legend class="fieldset-legend">{{ __('admin.users.assigned_roles') }}</legend>
-                        @if (auth()->user()->hasRole('Admin') && $user->hasRole('Admin') && auth()->id() === $user->id)
+                        @if ($user->isAdmin())
                             <x-admin.ui.alert type="warning" class="mt-2 mb-3">
                                 {!! __('admin.users.admin_protected') !!}
                             </x-admin.ui.alert>
                         @endif
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
                             @foreach ($roles as $role)
-                                @php
-                                    $isProtected =
-                                        $role->name === 'Admin' &&
-                                        auth()->id() === $user->id &&
-                                        auth()->user()->hasRole('Admin');
-                                @endphp
-                                <label
-                                    class="flex items-center gap-2 cursor-pointer select-none group {{ $isProtected ? 'opacity-60 pointer-events-none' : '' }}">
-                                    <input type="checkbox" name="roles[]" value="{{ $role->name }}"
-                                        class="checkbox checkbox-primary checkbox-sm" x-model="form.roles"
-                                        @change="form.validate('roles')" @disabled($isProtected) />
-                                    <span class="text-sm group-hover:text-primary transition-colors">
-                                        {{ $role->name }}
-                                    </span>
-                                </label>
+                                @if ($role->name === 'Admin')
+                                    <label class="flex items-center gap-2 select-none opacity-60">
+                                        <input type="checkbox" class="checkbox checkbox-primary checkbox-sm" checked disabled />
+                                        <span class="text-sm">{{ $role->name }}</span>
+                                    </label>
+                                @else
+                                    <label class="flex items-center gap-2 cursor-pointer select-none group">
+                                        <input type="checkbox" name="roles[]" value="{{ $role->name }}"
+                                            class="checkbox checkbox-primary checkbox-sm" x-model="form.roles"
+                                            @change="form.validate('roles')" />
+                                        <span class="text-sm group-hover:text-primary transition-colors">
+                                            {{ $role->name }}
+                                        </span>
+                                    </label>
+                                @endif
                             @endforeach
                         </div>
                         @error('roles')

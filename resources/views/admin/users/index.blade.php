@@ -92,7 +92,7 @@
                                 @endcan
 
                                 @can('users.delete')
-                                    @if (auth()->id() !== $user->id)
+                                    @if (auth()->id() !== $user->id && ! $user->isAdmin())
                                         <button type="button" class="btn btn-ghost btn-xs btn-square"
                                             @click="deleteName = @js($user->name); deleteUrl = '{{ route('users.destroy', $user) }}'; $nextTick(() => document.getElementById('confirm-delete-user').showModal())">
                                             <i class="icofont-ui-delete text-error text-base"></i>
