@@ -42,7 +42,12 @@
                             <div class="flex items-center gap-3">
                                 <x-admin.ui.avatar :name="$user->name" :src="$user->profile_photo_url ?? null" size="sm" />
                                 <div>
-                                    <div class="font-medium text-sm">{{ $user->name }}</div>
+                                    <div class="font-medium text-sm flex items-center gap-2">
+                                        {{ $user->name }}
+                                        @if ($user->isPendingActivation())
+                                            <span class="badge badge-warning badge-xs">{{ __('admin.users.pending_activation') }}</span>
+                                        @endif
+                                    </div>
                                     <div class="text-xs opacity-60">#{{ $user->id }}</div>
                                 </div>
                             </div>

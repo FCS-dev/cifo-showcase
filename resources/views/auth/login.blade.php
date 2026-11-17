@@ -56,16 +56,13 @@
                     </p>
                 </fieldset>
 
-                {{-- Remember + Forgot --}}
+                {{-- Remember --}}
                 <div class="flex items-center justify-between">
                     <label class="label cursor-pointer gap-2">
                         <input type="checkbox" name="remember" class="checkbox checkbox-primary checkbox-sm"
                             x-model="form.remember" />
                         <span class="label-text text-sm">{{ __('admin.auth.remember') }}</span>
                     </label>
-                    <a href="{{ route('password.request') }}" class="text-sm text-primary hover:underline">
-                        {{ __('admin.auth.forgot') }}
-                    </a>
                 </div>
 
                 {{-- Submit --}}

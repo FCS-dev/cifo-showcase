@@ -16,10 +16,18 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Front\PageController;
 use App\Http\Controllers\Front\ProjectController;
 use Illuminate\Support\Facades\Route;
+use Laravel\Fortify\Http\Controllers\NewPasswordController;
 
 // ── Redirect root to default locale ──────────────────────────
 
 Route::get('/', fn () => redirect('/es'));
+
+// ── Password reset (used by Admin-generated links) ───────────
+
+Route::middleware('guest')->group(function () {
+    Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
+    Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('password.update');
+});
 
 // ── Front public ─────────────────────────────────────────────
 
@@ -54,6 +62,9 @@ Route::middleware(['auth', 'verified', 'admin.locale'])
             ->name('institutional.update');
         Route::delete('/institutional/{siteImage:key}/image', [InstitutionalImageController::class, 'destroyImage'])
             ->name('institutional.image.destroy');
+
+        Route::post('/users/{user}/access-link', [UserController::class, 'accessLink'])
+            ->name('users.access-link');
 
         Route::resource('users', UserController::class);
         Route::resource('roles', RoleController::class)->except('show');

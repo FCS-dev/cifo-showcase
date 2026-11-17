@@ -13,6 +13,7 @@
     <x-admin.ui.card class="max-w-2xl">
         <form method="POST" action="{{ route('users.store') }}" novalidate autocomplete="off" x-data="{
             form: $form('post', '{{ route('users.store') }}', {
+                mode: 'password',
                 name: '',
                 email: '',
                 password: '',
@@ -20,8 +21,29 @@
                 roles: []
             })
         }"
-            @submit.prevent="form.submit({ onSuccess: () => window.location.href = '{{ route('users.index') }}' })">
+            @submit.prevent="form.submit({ onSuccess: (response) => window.location.href = response?.data?.redirect ?? '{{ route('users.index') }}' })">
             @csrf
+
+            @if ($canGenerateLinks)
+                <fieldset class="fieldset mb-5">
+                    <legend class="fieldset-legend">{{ __('admin.users.access_mode') }}</legend>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <label class="label cursor-pointer justify-start gap-2">
+                            <input type="radio" name="mode" value="password" class="radio radio-primary radio-sm"
+                                x-model="form.mode" />
+                            <span class="label-text">{{ __('admin.users.access_mode_password') }}</span>
+                        </label>
+                        <label class="label cursor-pointer justify-start gap-2">
+                            <input type="radio" name="mode" value="activation" class="radio radio-primary radio-sm"
+                                x-model="form.mode" />
+                            <span class="label-text">{{ __('admin.users.access_mode_activation') }}</span>
+                        </label>
+                    </div>
+                    <p class="fieldset-label" x-show="form.mode === 'activation'" x-cloak>
+                        <i class="icofont-info-circle"></i> {{ __('admin.users.access_mode_activation_help') }}
+                    </p>
+                </fieldset>
+            @endif
 
             {{-- Datos personales --}}
             <div class="grid grid-cols-1 gap-4">
@@ -33,7 +55,7 @@
             </div>
 
             {{-- Contraseña --}}
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4" x-show="form.mode === 'password'" x-cloak>
                 <x-admin.ui.input name="password" :label="__('admin.common.password')" type="password" icon="icofont-lock"
                     :placeholder="__('admin.users.password_placeholder')" :required="true" autocomplete="new-password"
                     data-lpignore="true" data-1p-ignore="true" x-model="form.password" @change="form.validate('password')" />

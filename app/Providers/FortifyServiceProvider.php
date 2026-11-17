@@ -10,6 +10,7 @@ use App\Http\Responses\PasswordUpdateResponse;
 use App\Http\Responses\ProfileInformationUpdatedResponse;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -35,6 +36,19 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
         Fortify::redirectUserForTwoFactorAuthenticationUsing(RedirectIfTwoFactorAuthenticatable::class);
 
+        // Pending accounts cannot log in until they set their password
+        Fortify::authenticateUsing(function (Request $request) {
+            $credentials = $request->only(Fortify::username(), 'password');
+            $provider = Auth::guard(config('fortify.guard'))->getProvider();
+            $user = $provider->retrieveByCredentials($credentials);
+
+            if (! $user || ! $provider->validateCredentials($user, $credentials)) {
+                return null;
+            }
+
+            return $user->activated_at !== null ? $user : null;
+        });
+
         // Login Request
         $this->app->bind(FortifyLoginRequest::class, LoginRequest::class);
 
@@ -58,7 +72,6 @@ class FortifyServiceProvider extends ServiceProvider
 
         // Views
         Fortify::loginView(fn () => view('auth.login'));
-        Fortify::requestPasswordResetLinkView(fn () => view('auth.forgot-password'));
         Fortify::resetPasswordView(fn ($request) => view('auth.reset-password', ['request' => $request]));
         Fortify::verifyEmailView(fn () => view('auth.verify-email'));
         Fortify::confirmPasswordView(fn () => view('auth.confirm-password'));

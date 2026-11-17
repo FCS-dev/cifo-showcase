@@ -16,8 +16,14 @@ class UserSeeder extends Seeder
                 'name' => 'Editor',
                 'password' => 'editor123',
                 'locale' => 'ca',
+                'activated_at' => now(),
             ]
         );
+
+        if ($editUser->activated_at === null) {
+            $editUser->update(['activated_at' => now()]);
+        }
+
         $editUser->assignRole('Editor');
 
         // Create demo Viewer users only once

@@ -15,10 +15,15 @@ class StoreUserRequest extends FormRequest
 
     public function rules(): array
     {
+        $mode = $this->input('mode', 'password');
+
         return [
+            'mode' => ['sometimes', 'string', Rule::in(['password', 'activation'])],
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()],
+            'password' => $mode === 'activation'
+                ? ['nullable']
+                : ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()],
             'roles' => ['nullable', 'array'],
             'roles.*' => ['string', 'exists:roles,name', Rule::notIn(['Admin'])],
         ];
@@ -32,6 +37,7 @@ class StoreUserRequest extends FormRequest
             'email.required' => 'El correo electrónico es obligatorio.',
             'email.email' => 'Introduce un correo electrónico válido.',
             'email.unique' => 'Este correo electrónico ya está registrado.',
+            'mode.in' => 'El método de acceso seleccionado no es válido.',
             'password.required' => 'La contraseña es obligatoria.',
             'password.confirmed' => 'Las contraseñas no coinciden.',
             'roles.array' => 'El formato de roles no es válido.',

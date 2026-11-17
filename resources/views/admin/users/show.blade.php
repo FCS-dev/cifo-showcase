@@ -11,8 +11,11 @@
             <x-admin.ui.avatar :name="$user->name" :src="$user->profile_photo_url ?? null" size="lg" />
             <div>
                 <h1 class="text-2xl font-bold">{{ $user->name }}</h1>
-                <p class="text-sm opacity-60 flex items-center gap-1">
+                <p class="text-sm opacity-60 flex items-center gap-1 flex-wrap">
                     <i class="icofont-email"></i> {{ $user->email }}
+                    @if ($user->isPendingActivation())
+                        <span class="badge badge-warning badge-xs">{{ __('admin.users.pending_activation') }}</span>
+                    @endif
                     @if ($user->email_verified_at)
                         <span class="badge badge-success badge-xs">{{ __('admin.common.verified') }}</span>
                     @else
@@ -25,6 +28,14 @@
             <x-admin.ui.button :href="route('users.index')" variant="ghost" icon="icofont-arrow-left">
                 {{ __('admin.common.back') }}
             </x-admin.ui.button>
+            @if (auth()->user()->isAdmin())
+                <form method="POST" action="{{ route('users.access-link', $user) }}">
+                    @csrf
+                    <x-admin.ui.button type="submit" variant="info" icon="icofont-key">
+                        {{ __('admin.users.generate_access_link') }}
+                    </x-admin.ui.button>
+                </form>
+            @endif
             @can('users.update')
                 <x-admin.ui.button :href="route('users.edit', $user)" icon="icofont-edit">
                     {{ __('admin.common.edit') }}
@@ -32,6 +43,40 @@
             @endcan
         </div>
     </div>
+
+    @if (session('activation_url'))
+        <div class="mb-6" x-data="{
+            copied: false,
+            copy() {
+                navigator.clipboard.writeText(this.$refs.link.value).then(() => {
+                    this.copied = true;
+                    setTimeout(() => this.copied = false, 2000);
+                });
+            }
+        }">
+            <x-admin.ui.card>
+                <h2 class="text-lg font-semibold mb-2 flex items-center gap-2">
+                    <i class="icofont-key text-primary"></i> {{ __('admin.users.access_link_title') }}
+                </h2>
+                <p class="text-sm text-warning mb-3">
+                    <i class="icofont-warning-alt"></i> {{ __('admin.users.access_link_warning') }}
+                </p>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <input x-ref="link" type="text" readonly value="{{ session('activation_url') }}"
+                        class="input input-bordered w-full font-mono text-xs" onclick="this.select()" />
+                    <button type="button" class="btn btn-primary shrink-0" @click="copy()">
+                        <i class="icofont-ui-copy"></i>
+                        <span x-text="copied ? '{{ __('admin.users.link_copied') }}' : '{{ __('admin.users.copy_link') }}'"></span>
+                    </button>
+                </div>
+                @if (session('activation_expires_at'))
+                    <p class="text-xs opacity-60 mt-2">
+                        {{ __('admin.users.link_expires_at', ['date' => \Illuminate\Support\Carbon::parse(session('activation_expires_at'))->format('d/m/Y H:i')]) }}
+                    </p>
+                @endif
+            </x-admin.ui.card>
+        </div>
+    @endif
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 

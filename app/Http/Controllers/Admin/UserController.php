@@ -7,11 +7,14 @@ use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\PasswordResetLinkService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class UserController extends Controller
@@ -60,18 +63,26 @@ class UserController extends Controller
         Gate::authorize('users.create');
 
         $roles = Role::where('name', '!=', 'Admin')->orderBy('name')->get();
+        $canGenerateLinks = auth()->user()->isAdmin();
 
-        return view('admin.users.create', compact('roles'));
+        return view('admin.users.create', compact('roles', 'canGenerateLinks'));
     }
 
-    public function store(StoreUserRequest $request): RedirectResponse|Response
+    public function store(StoreUserRequest $request, PasswordResetLinkService $links): RedirectResponse|Response|JsonResponse
     {
         Gate::authorize('users.create');
+
+        $mode = $request->input('mode', 'password');
+
+        if ($mode === 'activation') {
+            abort_unless($request->user()->isAdmin(), 403);
+        }
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'password' => $mode === 'activation' ? Str::password(40) : Hash::make($request->password),
+            'activated_at' => $mode === 'activation' ? null : now(),
         ]);
 
         if ($request->has('roles')) {
@@ -87,13 +98,24 @@ class UserController extends Controller
             }
         }
 
-        session()->flash('success', 'Usuario creado correctamente.');
+        if ($mode === 'activation') {
+            $link = $links->createFor($user);
 
-        if ($request->wantsJson()) {
-            return response()->noContent();
+            session()->flash('activation_url', $link['url']);
+            session()->flash('activation_expires_at', $link['expires_at']);
         }
 
-        return redirect()->route('users.index');
+        session()->flash('success', 'Usuario creado correctamente.');
+
+        $redirect = $mode === 'activation'
+            ? route('users.show', $user)
+            : route('users.index');
+
+        if ($request->wantsJson()) {
+            return response()->json(['redirect' => $redirect]);
+        }
+
+        return redirect($redirect);
     }
 
     /**
@@ -131,7 +153,13 @@ class UserController extends Controller
         $user->update($request->only('name'));
 
         if ($request->filled('password')) {
-            $user->update(['password' => Hash::make($request->password)]);
+            $attributes = ['password' => Hash::make($request->password)];
+
+            if ($user->activated_at === null) {
+                $attributes['activated_at'] = now();
+            }
+
+            $user->update($attributes);
         }
 
         if ($request->has('roles')) {
@@ -155,6 +183,18 @@ class UserController extends Controller
         }
 
         return redirect()->route('users.index');
+    }
+
+    public function accessLink(Request $request, User $user, PasswordResetLinkService $links): RedirectResponse
+    {
+        abort_unless($request->user()->isAdmin(), 403);
+
+        $link = $links->createFor($user);
+
+        session()->flash('activation_url', $link['url']);
+        session()->flash('activation_expires_at', $link['expires_at']);
+
+        return redirect()->route('users.show', $user);
     }
 
     public function destroy(User $user): RedirectResponse

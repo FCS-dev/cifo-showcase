@@ -23,6 +23,10 @@ class AdminUserSeeder extends Seeder
                 $user->restore();
             }
 
+            if ($user->activated_at === null) {
+                $user->forceFill(['activated_at' => now()])->save();
+            }
+
             $user->assignRole('Admin');
 
             return;
@@ -40,6 +44,7 @@ class AdminUserSeeder extends Seeder
             'password' => config('admin.password'),
             'locale' => 'es',
             'email_verified_at' => now(),
+            'activated_at' => now(),
         ]);
 
         $user->assignRole('Admin');
