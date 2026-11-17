@@ -50,4 +50,69 @@
         </form>
     </x-admin.ui.card>
 
+    <x-admin.ui.card class="mt-6">
+        <h2 class="text-lg font-semibold mb-1">{{ __('admin.students.projects_title') }}</h2>
+        <p class="text-sm opacity-60 mb-4">{{ __('admin.students.projects_sub') }}</p>
+
+        @if ($projects->isEmpty())
+            <p class="text-sm opacity-50 flex items-center gap-2">
+                <i class="icofont-info-circle"></i> {{ __('admin.students.projects_empty') }}
+            </p>
+        @else
+            <div class="overflow-x-auto">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>{{ __('admin.students.col_project') }}</th>
+                            <th>{{ __('admin.students.col_course') }}</th>
+                            <th>{{ __('admin.students.col_status') }}</th>
+                            <th>{{ __('admin.students.col_date') }}</th>
+                            <th class="text-right"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($projects as $project)
+                            @php
+                                $canOpen = is_null($ownedCourseIds) || in_array($project->course_id, $ownedCourseIds, true);
+                                $statusColor = match ($project->status) {
+                                    'published' => 'success',
+                                    'pending' => 'warning',
+                                    'rejected' => 'error',
+                                    default => 'neutral',
+                                };
+                            @endphp
+                            <tr class="hover">
+                                <td class="font-medium text-sm">{{ $project->title }}</td>
+                                <td class="text-sm">
+                                    @if ($project->course)
+                                        <code class="bg-base-200 px-1.5 py-0.5 rounded text-xs">{{ $project->course->course_code }}</code>
+                                        <span class="ml-1">{{ $project->course->name }}</span>
+                                    @else
+                                        <span class="opacity-40">—</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <x-admin.ui.badge :color="$statusColor">
+                                        {{ __('admin.projects.status_' . $project->status) }}
+                                    </x-admin.ui.badge>
+                                </td>
+                                <td class="text-sm opacity-70">{{ $project->project_date->format('m/Y') }}</td>
+                                <td class="text-right">
+                                    @if ($canOpen)
+                                        @can('projects.view')
+                                            <a href="{{ route('admin.projects.show', $project) }}"
+                                                class="btn btn-ghost btn-xs btn-square" title="{{ __('admin.common.view') }}">
+                                                <i class="icofont-eye text-info text-base"></i>
+                                            </a>
+                                        @endcan
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
+    </x-admin.ui.card>
+
 </x-layouts.admin>

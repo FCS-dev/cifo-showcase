@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreStudentRequest;
 use App\Http\Requests\UpdateStudentRequest;
 use App\Models\Student;
+use App\Services\TeacherProjectScope;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -14,6 +15,10 @@ use Illuminate\View\View;
 
 class StudentController extends Controller
 {
+    public function __construct(private TeacherProjectScope $teacherScope)
+    {
+    }
+
     public function index(Request $request): View
     {
         Gate::authorize('students.view');
@@ -66,11 +71,20 @@ class StudentController extends Controller
         return redirect()->route('students.index');
     }
 
-    public function edit(Student $student): View
+    public function edit(Request $request, Student $student): View
     {
         Gate::authorize('students.update');
 
-        return view('admin.students.edit', compact('student'));
+        $projects = $student->projects()
+            ->with('course')
+            ->orderByDesc('project_date')
+            ->get();
+
+        $ownedCourseIds = $this->teacherScope->appliesTo($request->user())
+            ? $this->teacherScope->courseIds($request->user())
+            : null;
+
+        return view('admin.students.edit', compact('student', 'projects', 'ownedCourseIds'));
     }
 
     public function update(UpdateStudentRequest $request, Student $student): RedirectResponse|Response
@@ -91,6 +105,10 @@ class StudentController extends Controller
     public function destroy(Student $student): RedirectResponse
     {
         Gate::authorize('students.delete');
+
+        if ($student->projects()->exists()) {
+            return back()->with('error', __('admin.students.delete_blocked_projects'));
+        }
 
         $student->delete();
 

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Teacher;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class TeacherSeeder extends Seeder
@@ -28,7 +29,32 @@ class TeacherSeeder extends Seeder
         ];
 
         foreach ($teachers as $data) {
-            Teacher::create($data);
+            $teacher = Teacher::firstOrCreate(
+                ['email' => $data['email']],
+                ['name' => $data['name']]
+            );
+
+            $user = User::firstOrCreate(
+                ['email' => $data['email']],
+                [
+                    'name' => $data['name'],
+                    'password' => 'teacher123',
+                    'locale' => 'es',
+                    'email_verified_at' => now(),
+                    'activated_at' => now(),
+                ]
+            );
+
+            if (! $user->hasRole('Teacher')) {
+                $user->assignRole('Teacher');
+            }
+
+            if ($teacher->user_id !== $user->id || $teacher->name !== $data['name']) {
+                $teacher->update([
+                    'user_id' => $user->id,
+                    'name' => $data['name'],
+                ]);
+            }
         }
     }
 }

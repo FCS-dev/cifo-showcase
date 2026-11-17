@@ -16,8 +16,6 @@
     <form method="POST" action="{{ route('teachers.update', $teacher) }}" novalidate class="space-y-6"
         x-data="{
             form: $form('patch', '{{ route('teachers.update', $teacher) }}', {
-                name: @js($teacher->name),
-                email: @js($teacher->email),
                 courses: @js($selectedCourses).map(String)
             })
         }"
@@ -26,12 +24,15 @@
         @method('PATCH')
 
         <x-admin.ui.card>
-            <div class="space-y-4">
-                <x-admin.ui.input name="name" :label="__('admin.teachers.col_name')" icon="icofont-user" :required="true"
-                    x-model="form.name" @change="form.validate('name')" />
-
-                <x-admin.ui.input name="email" :label="__('admin.teachers.col_email')" type="email" icon="icofont-mail" :required="true"
-                    x-model="form.email" @change="form.validate('email')" />
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                <div>
+                    <p class="opacity-50 mb-0.5">{{ __('admin.teachers.col_name') }}</p>
+                    <p class="font-medium">{{ $teacher->name }}</p>
+                </div>
+                <div>
+                    <p class="opacity-50 mb-0.5">{{ __('admin.teachers.col_email') }}</p>
+                    <p class="font-medium">{{ $teacher->email }}</p>
+                </div>
             </div>
 
             <div class="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-xs opacity-50">

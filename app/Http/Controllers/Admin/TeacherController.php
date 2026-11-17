@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreTeacherRequest;
 use App\Http\Requests\UpdateTeacherRequest;
 use App\Models\Course;
 use App\Models\Teacher;
@@ -45,36 +44,6 @@ class TeacherController extends Controller
         return view('admin.teachers.index', compact('teachers'));
     }
 
-    public function create(): View
-    {
-        Gate::authorize('teachers.create');
-
-        $locale = app()->getLocale();
-        $courseOptions = Course::orderBy("name->{$locale}")->get();
-
-        return view('admin.teachers.create', compact('courseOptions'));
-    }
-
-    public function store(StoreTeacherRequest $request): RedirectResponse|Response
-    {
-        Gate::authorize('teachers.create');
-
-        $validated = $request->validated();
-        $courses = $validated['courses'] ?? [];
-        unset($validated['courses']);
-
-        $teacher = Teacher::create($validated);
-        $teacher->courses()->sync($courses);
-
-        session()->flash('success', __('admin.teachers.created'));
-
-        if ($request->wantsJson()) {
-            return response()->noContent();
-        }
-
-        return redirect()->route('teachers.index');
-    }
-
     public function edit(Teacher $teacher): View
     {
         Gate::authorize('teachers.update');
@@ -90,12 +59,7 @@ class TeacherController extends Controller
     {
         Gate::authorize('teachers.update');
 
-        $validated = $request->validated();
-        $courses = $validated['courses'] ?? [];
-        unset($validated['courses']);
-
-        $teacher->update($validated);
-        $teacher->courses()->sync($courses);
+        $teacher->courses()->sync($request->input('courses', []));
 
         session()->flash('success', __('admin.teachers.updated'));
 
@@ -104,16 +68,5 @@ class TeacherController extends Controller
         }
 
         return redirect()->route('teachers.index');
-    }
-
-    public function destroy(Teacher $teacher): RedirectResponse
-    {
-        Gate::authorize('teachers.delete');
-
-        $teacher->delete();
-
-        return redirect()
-            ->route('teachers.index')
-            ->with('success', __('admin.teachers.deleted'));
     }
 }

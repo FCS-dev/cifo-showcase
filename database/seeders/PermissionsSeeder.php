@@ -25,6 +25,10 @@ class PermissionsSeeder extends Seeder
 
         foreach ($entities as $entity) {
             foreach ($actions as $action) {
+                if ($entity === 'teachers' && $action === 'create') {
+                    continue;
+                }
+
                 $permissions[] = "{$entity}.{$action}";
             }
         }
@@ -32,6 +36,8 @@ class PermissionsSeeder extends Seeder
         foreach (array_unique($permissions) as $permission) {
             Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
         }
+
+        Permission::where('name', 'teachers.create')->where('guard_name', 'web')->delete();
 
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
     }

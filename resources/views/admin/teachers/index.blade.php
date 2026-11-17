@@ -4,22 +4,14 @@
         ['label' => __('admin.teachers.title')],
     ]" />
 
-    <x-admin.ui.confirm-delete id="confirm-delete-teacher" :title-key="'admin.teachers.delete_modal_title'">
-
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
-            <div>
-                <h1 class="text-2xl font-bold">{{ __('admin.teachers.title') }}</h1>
-                <p class="text-sm opacity-70">
-                    {{ __('admin.teachers.count', ['count' => $teachers->total()]) }}
-                </p>
-            </div>
-
-            @can('teachers.create')
-                <x-admin.ui.button :href="route('teachers.create')" icon="icofont-plus">
-                    {{ __('admin.teachers.create') }}
-                </x-admin.ui.button>
-            @endcan
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
+        <div>
+            <h1 class="text-2xl font-bold">{{ __('admin.teachers.title') }}</h1>
+            <p class="text-sm opacity-70">
+                {{ __('admin.teachers.count', ['count' => $teachers->total()]) }}
+            </p>
         </div>
+    </div>
 
         <x-admin.ui.card>
 
@@ -62,12 +54,7 @@
                                     </a>
                                 @endcan
 
-                                @can('teachers.delete')
-                                    <button type="button" class="btn btn-ghost btn-xs btn-square"
-                                        @click="deleteName = @js($teacher->name); deleteUrl = '{{ route('teachers.destroy', $teacher) }}'; $nextTick(() => document.getElementById('confirm-delete-teacher').showModal())">
-                                        <i class="icofont-ui-delete text-error text-base"></i>
-                                    </button>
-                                @endcan
+
                             </div>
                         </td>
                     </tr>
@@ -85,6 +72,5 @@
 
         </x-admin.ui.card>
 
-    </x-admin.ui.confirm-delete>
 
 </x-layouts.admin>

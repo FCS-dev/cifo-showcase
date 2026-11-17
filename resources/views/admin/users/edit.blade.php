@@ -17,7 +17,7 @@
                 name: '{{ addslashes($user->name) }}',
                 password: '',
                 password_confirmation: '',
-                roles: {{ Js::from($user->roles->pluck('name')->reject(fn ($name) => $name === 'Admin')->values()) }}
+                roles: {{ Js::from($user->roles->pluck('name')->reject(fn ($name) => in_array($name, ['Admin', 'Teacher'], true))->values()) }}
             })
         }"
             @submit.prevent="form.submit({ onSuccess: () => window.location.href = '{{ route('users.index') }}' })">
@@ -58,9 +58,14 @@
                                 {!! __('admin.users.admin_protected') !!}
                             </x-admin.ui.alert>
                         @endif
+                        @if ($user->hasRole('Teacher'))
+                            <x-admin.ui.alert type="warning" class="mt-2 mb-3">
+                                {!! __('admin.users.teacher_protected') !!}
+                            </x-admin.ui.alert>
+                        @endif
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
                             @foreach ($roles as $role)
-                                @if ($role->name === 'Admin')
+                                @if ($role->isAdmin() || $role->isTeacher())
                                     <label class="flex items-center gap-2 select-none opacity-60">
                                         <input type="checkbox" class="checkbox checkbox-primary checkbox-sm" checked disabled />
                                         <span class="text-sm">{{ $role->name }}</span>

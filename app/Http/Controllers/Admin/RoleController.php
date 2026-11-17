@@ -47,6 +47,7 @@ class RoleController extends Controller
         Gate::authorize('roles.update');
 
         abort_if($role->isAdmin(), 403, 'El rol Admin no puede modificarse.');
+        abort_if($role->isTeacher(), 403, 'El rol Teacher no puede modificarse.');
 
         $permissions = Permission::orderBy('name')->get()->groupBy(fn ($p) => explode('.', $p->name)[0]);
         $rolePermissions = $role->permissions->pluck('name')->toArray();
@@ -58,6 +59,7 @@ class RoleController extends Controller
     {
         Gate::authorize('roles.update');
         abort_if($role->isAdmin(), 403, 'El rol Admin no puede modificarse.');
+        abort_if($role->isTeacher(), 403, 'El rol Teacher no puede modificarse.');
 
         $role->update(['name' => $request->name]);
         $role->syncPermissions($request->permissions ?? []);
@@ -70,6 +72,7 @@ class RoleController extends Controller
     {
         Gate::authorize('roles.delete');
         abort_if($role->isAdmin(), 403, 'El rol Admin no puede eliminarse.');
+        abort_if($role->isTeacher(), 403, 'El rol Teacher no puede eliminarse.');
 
         $name = $role->name;
         $role->delete();

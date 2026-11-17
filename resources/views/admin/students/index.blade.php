@@ -63,10 +63,12 @@
                                 @endcan
 
                                 @can('students.delete')
-                                    <button type="button" class="btn btn-ghost btn-xs btn-square"
-                                        @click="deleteName = @js($student->name); deleteUrl = '{{ route('students.destroy', $student) }}'; $nextTick(() => document.getElementById('confirm-delete-student').showModal())">
-                                        <i class="icofont-ui-delete text-error text-base"></i>
-                                    </button>
+                                    @if ($student->projects_count === 0)
+                                        <button type="button" class="btn btn-ghost btn-xs btn-square"
+                                            @click="deleteName = @js($student->name); deleteUrl = '{{ route('students.destroy', $student) }}'; $nextTick(() => document.getElementById('confirm-delete-student').showModal())">
+                                            <i class="icofont-ui-delete text-error text-base"></i>
+                                        </button>
+                                    @endif
                                 @endcan
                             </div>
                         </td>

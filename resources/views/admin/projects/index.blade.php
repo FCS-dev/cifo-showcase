@@ -15,9 +15,11 @@
             </div>
 
             @can('projects.create')
-                <x-admin.ui.button :href="route('admin.projects.create')" icon="icofont-plus">
-                    {{ __('admin.projects.create') }}
-                </x-admin.ui.button>
+                @if ($canCreateProjects ?? true)
+                    <x-admin.ui.button :href="route('admin.projects.create')" icon="icofont-plus">
+                        {{ __('admin.projects.create') }}
+                    </x-admin.ui.button>
+                @endif
             @endcan
         </div>
 

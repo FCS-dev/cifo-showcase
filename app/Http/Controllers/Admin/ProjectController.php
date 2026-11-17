@@ -5,19 +5,25 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
-use App\Models\Course;
 use App\Models\Project;
 use App\Models\Student;
 use App\Models\Tag;
+use App\Models\User;
+use App\Services\TeacherProjectScope;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class ProjectController extends Controller
 {
+    public function __construct(private TeacherProjectScope $teacherScope)
+    {
+    }
+
     public function index(Request $request): View
     {
         Gate::authorize('projects.view');
@@ -38,9 +44,17 @@ class ProjectController extends Controller
         $direction = $request->query('direction', 'desc');
         $perPage = (int) $request->query('per_page', 10);
         $locale = app()->getLocale();
+        $user = $request->user();
+        $isScoped = $this->teacherScope->appliesTo($user);
+        $courseIds = $this->teacherScope->courseIds($user);
+
+        if ($isScoped && $courseFilter && ! in_array((int) $courseFilter, $courseIds, true)) {
+            abort(403);
+        }
 
         $projects = Project::query()
             ->with(['course', 'tags'])
+            ->when($isScoped, fn ($q) => $q->whereIn('course_id', $courseIds))
             ->when($search, fn ($q) => $q->whereRaw(
                 'LOWER(JSON_UNQUOTE(JSON_EXTRACT(`title`, ?))) LIKE ?',
                 ['$.'.$locale, mb_strtolower("%{$search}%")]
@@ -51,19 +65,26 @@ class ProjectController extends Controller
             ->paginate($perPage)
             ->withQueryString();
 
-        $courses = Course::orderBy("name->{$locale}")->get();
+        $courses = $this->teacherScope->availableCourses($user, $locale);
+        $canCreateProjects = ! $isScoped || $courseIds !== [];
 
-        return view('admin.projects.index', compact('projects', 'courses'));
+        return view('admin.projects.index', compact('projects', 'courses', 'canCreateProjects'));
     }
 
-    public function create(): View
+    public function create(Request $request): View|RedirectResponse
     {
         Gate::authorize('projects.create');
 
+        $user = $request->user();
         $locale = app()->getLocale();
-        $courseOptions = Course::orderBy("name->{$locale}")->get()
-            ->mapWithKeys(fn ($c) => [$c->id => "[{$c->course_code}] {$c->name}"])
-            ->toArray();
+
+        if ($this->teacherScope->appliesTo($user) && $this->teacherScope->courseIds($user) === []) {
+            return redirect()
+                ->route('admin.projects.index')
+                ->with('error', __('admin.projects.no_courses'));
+        }
+
+        $courseOptions = $this->courseOptions($user, $locale);
         $tags = Tag::orderBy("name->{$locale}")->get();
         $students = Student::orderBy('name')->get();
 
@@ -75,6 +96,7 @@ class ProjectController extends Controller
         Gate::authorize('projects.create');
 
         $validated = $request->validated();
+        $this->ensureCourseAllowed($request->user(), (int) $validated['course_id']);
         $tags = $validated['tags'] ?? [];
         $students = $validated['students'] ?? [];
         $filesData = $validated['files'] ?? [];
@@ -96,23 +118,23 @@ class ProjectController extends Controller
         return redirect()->route('admin.projects.index')->with('success', __('admin.projects.created'));
     }
 
-    public function show(Project $project): View
+    public function show(Request $request, Project $project): View
     {
         Gate::authorize('projects.view');
+        $this->ensureProjectVisible($request->user(), $project);
 
         $project->load(['course', 'tags', 'students', 'files', 'media']);
 
         return view('admin.projects.show', compact('project'));
     }
 
-    public function edit(Project $project): View
+    public function edit(Request $request, Project $project): View
     {
         Gate::authorize('projects.update');
+        $this->ensureProjectVisible($request->user(), $project);
 
         $locale = app()->getLocale();
-        $courseOptions = Course::orderBy("name->{$locale}")->get()
-            ->mapWithKeys(fn ($c) => [$c->id => "[{$c->course_code}] {$c->name}"])
-            ->toArray();
+        $courseOptions = $this->courseOptions($request->user(), $locale);
         $tags = Tag::orderBy("name->{$locale}")->get();
         $selectedTags = $project->tags->pluck('id')->toArray();
         $students = Student::orderBy('name')->get();
@@ -124,8 +146,10 @@ class ProjectController extends Controller
     public function update(UpdateProjectRequest $request, Project $project): RedirectResponse
     {
         Gate::authorize('projects.update');
+        $this->ensureProjectVisible($request->user(), $project);
 
         $validated = $request->validated();
+        $this->ensureCourseAllowed($request->user(), (int) $validated['course_id']);
         $tags = $validated['tags'] ?? [];
         $students = $validated['students'] ?? [];
         $filesData = $validated['files'] ?? [];
@@ -166,13 +190,42 @@ class ProjectController extends Controller
         return redirect()->route('admin.projects.index')->with('success', __('admin.projects.updated'));
     }
 
-    public function destroy(Project $project): RedirectResponse
+    public function destroy(Request $request, Project $project): RedirectResponse
     {
         Gate::authorize('projects.delete');
+        $this->ensureProjectVisible($request->user(), $project);
 
         $project->delete();
 
         return redirect()->route('admin.projects.index')->with('success', __('admin.projects.deleted'));
+    }
+
+    private function ensureCourseAllowed(User $user, int $courseId): void
+    {
+        if (! $this->teacherScope->appliesTo($user)) {
+            return;
+        }
+
+        if (! in_array($courseId, $this->teacherScope->courseIds($user), true)) {
+            throw ValidationException::withMessages([
+                'course_id' => __('admin.projects.course_not_allowed'),
+            ]);
+        }
+    }
+
+    private function ensureProjectVisible(User $user, Project $project): void
+    {
+        abort_unless($this->teacherScope->allowsProject($user, $project), 404);
+    }
+
+    /**
+     * @return array<int,string>
+     */
+    private function courseOptions(User $user, string $locale): array
+    {
+        return $this->teacherScope->availableCourses($user, $locale)
+            ->mapWithKeys(fn ($course) => [$course->id => "[{$course->course_code}] {$course->name}"])
+            ->toArray();
     }
 
     /**

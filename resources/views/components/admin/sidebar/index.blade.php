@@ -377,18 +377,7 @@
                                         {{ __('admin.nav.teachers_list') }}
                                     </a>
                                 </li>
-                                @can('teachers.create')
-                                    <li>
-                                        <a href="{{ route('teachers.create') }}" @class([
-                                            'block pl-9 pr-3 py-2.5 rounded-lg text-sm transition-colors',
-                                            'bg-white text-primary font-semibold' => request()->routeIs(
-                                                'teachers.create'),
-                                            'hover:bg-neutral-content/10' => !request()->routeIs('teachers.create'),
-                                        ])>
-                                            {{ __('admin.nav.teachers_create') }}
-                                        </a>
-                                    </li>
-                                @endcan
+
                             </ul>
                         </details>
                     </li>

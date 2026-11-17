@@ -37,4 +37,9 @@ class User extends Authenticatable
     {
         return $this->activated_at === null;
     }
+
+    public function teacher()
+    {
+        return $this->hasOne(Teacher::class);
+    }
 }

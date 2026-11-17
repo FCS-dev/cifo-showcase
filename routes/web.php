@@ -76,7 +76,7 @@ Route::middleware(['auth', 'verified', 'admin.locale'])
             ->name('categories.image.destroy');
         Route::resource('categories', CategoryController::class)->except('show');
         Route::resource('students', StudentController::class)->except('show');
-        Route::resource('teachers', TeacherController::class)->except('show');
+        Route::resource('teachers', TeacherController::class)->only(['index', 'edit', 'update']);
 
         Route::post('/locale', [LocaleController::class, 'update'])
             ->name('admin.locale.update');

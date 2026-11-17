@@ -27,5 +27,9 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
         $user->forceFill([
             'name' => $input['name'],
         ])->save();
+
+        if ($teacher = $user->teacher()->first()) {
+            $teacher->update(['name' => $user->name]);
+        }
     }
 }

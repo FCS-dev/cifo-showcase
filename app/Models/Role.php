@@ -23,4 +23,9 @@ class Role extends SpatieRole
     {
         return $this->name === 'Admin';
     }
+
+    public function isTeacher(): bool
+    {
+        return $this->name === 'Teacher';
+    }
 }

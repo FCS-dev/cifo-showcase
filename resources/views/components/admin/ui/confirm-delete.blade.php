@@ -21,7 +21,7 @@
             <p class="text-sm font-semibold" x-text="{{ $nameVar }}"></p>
             <div class="modal-action">
                 <form method="dialog">
-                    <x-admin.ui.button variant="neutral" :ghost="true">
+                    <x-admin.ui.button type="submit" variant="neutral" :ghost="true">
                         {{ __('admin.common.cancel') }}
                     </x-admin.ui.button>
                 </form>

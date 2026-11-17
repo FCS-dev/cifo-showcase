@@ -6,15 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\Role;
+use App\Models\Teacher;
 use App\Models\User;
 use App\Services\PasswordResetLinkService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class UserController extends Controller
@@ -78,25 +81,31 @@ class UserController extends Controller
             abort_unless($request->user()->isAdmin(), 403);
         }
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => $mode === 'activation' ? Str::password(40) : Hash::make($request->password),
-            'activated_at' => $mode === 'activation' ? null : now(),
-        ]);
+        $user = DB::transaction(function () use ($request, $mode) {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => $mode === 'activation' ? Str::password(40) : Hash::make($request->password),
+                'activated_at' => $mode === 'activation' ? null : now(),
+            ]);
 
-        if ($request->has('roles')) {
-            Gate::authorize('users.assign-roles');
+            if ($request->has('roles')) {
+                Gate::authorize('users.assign-roles');
 
-            $roles = collect($request->input('roles', []))
-                ->reject(fn (string $role) => $role === 'Admin')
-                ->values()
-                ->all();
+                $roles = collect($request->input('roles', []))
+                    ->reject(fn (string $role) => $role === 'Admin')
+                    ->values()
+                    ->all();
 
-            if ($roles !== []) {
-                $user->assignRole($roles);
+                if ($roles !== []) {
+                    $user->assignRole($roles);
+                }
             }
-        }
+
+            $this->ensureTeacherProfile($user);
+
+            return $user;
+        });
 
         if ($mode === 'activation') {
             $link = $links->createFor($user);
@@ -137,9 +146,11 @@ class UserController extends Controller
     {
         Gate::authorize('users.update');
 
-        $roles = $user->isAdmin()
-            ? Role::orderBy('name')->get()
-            : Role::where('name', '!=', 'Admin')->orderBy('name')->get();
+        $roles = Role::query()
+            ->when(! $user->isAdmin(), fn ($query) => $query->where('name', '!=', 'Admin'))
+            ->when(! $user->hasRole('Teacher'), fn ($query) => $query->where('name', '!=', 'Teacher'))
+            ->orderBy('name')
+            ->get();
 
         $userRoleNames = $user->roles->pluck('name')->toArray();
 
@@ -173,7 +184,21 @@ class UserController extends Controller
                 $roles->push('Admin');
             }
 
+            if ($user->hasRole('Teacher')) {
+                $roles->push('Teacher');
+            } elseif ($roles->contains('Teacher')) {
+                throw ValidationException::withMessages([
+                    'roles' => 'El rol Teacher solo puede asignarse al crear el usuario.',
+                ]);
+            }
+
             $user->syncRoles($roles->unique()->values()->all());
+        }
+
+        $this->ensureTeacherProfile($user);
+
+        if ($teacher = $user->teacher()->first()) {
+            $teacher->update(['name' => $user->name]);
         }
 
         session()->flash('success', 'Usuario actualizado correctamente.');
@@ -206,8 +231,45 @@ class UserController extends Controller
             return back()->with('error', 'No se puede eliminar a un usuario administrador.');
         }
 
+        DB::table('sessions')->where('user_id', $user->id)->delete();
+        DB::table('password_reset_tokens')->where('email', $user->email)->delete();
+
         $user->delete();
 
         return redirect()->route('users.index')->with('success', 'Usuario eliminado correctamente.');
+    }
+
+    private function ensureTeacherProfile(User $user): void
+    {
+        if (! $user->hasRole('Teacher')) {
+            return;
+        }
+
+        $teacher = Teacher::withTrashed()->where('email', $user->email)->first();
+
+        if ($teacher) {
+            if ($teacher->user_id !== null && $teacher->user_id !== $user->id) {
+                throw ValidationException::withMessages([
+                    'roles' => 'Ya existe un profesor vinculado a otro usuario con ese correo.',
+                ]);
+            }
+
+            if ($teacher->trashed()) {
+                $teacher->restore();
+            }
+
+            $teacher->update([
+                'user_id' => $user->id,
+                'name' => $user->name,
+            ]);
+
+            return;
+        }
+
+        Teacher::create([
+            'user_id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+        ]);
     }
 }

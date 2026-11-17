@@ -11,6 +11,7 @@ class ProductionSeeder extends Seeder
         $this->call([
             PermissionsSeeder::class,
             AdminRoleSeeder::class,
+            TeacherRoleSeeder::class,
             AdminUserSeeder::class,
             InstitutionalSeeder::class,
             CategorySeeder::class,
